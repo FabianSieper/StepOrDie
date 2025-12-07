@@ -30,7 +30,7 @@ func GetPublicNotionPageContent(pageUrl string) (string, error) {
 	var res string
 
 	// 2. Drive the steps inside Chrome.
-	fmt.Println("Lade Notion Seite (Chrome)...")
+	fmt.Println("INFO - Loading Notion page in headless Chrome...")
 	err := chromedp.Run(ctx,
 		chromedp.Navigate(pageUrl),
 		// Important: wait until an element proves the JS finished rendering.
@@ -49,7 +49,7 @@ func GetPublicNotionPageContent(pageUrl string) (string, error) {
 	}
 
 	// 3. Clean the result and emit it.
-	fmt.Println("--- Inhalt gefunden ---")
+	fmt.Println("INFO - --- Extracted content ---")
 
 	// Simple cleanup (Notion tends to cram lines together).
 	lines := strings.Split(res, "\n")
