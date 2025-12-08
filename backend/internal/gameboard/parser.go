@@ -22,6 +22,8 @@ var playGroundSize = 20
 // ####################
 func ParseScenario(raw string) (*models.GameState, error) {
 	rows := strings.Split(raw, "\n")
+	// Rows come from top to bottom, so each string represents the Y axis,
+	// while characters within the row walk along the X axis from left to right.
 	rows = sanitizeRows(rows)
 
 	amountRows, amountCols, err := getAmountRowsAndCols(rows)
