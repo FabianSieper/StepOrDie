@@ -1,1 +1,11 @@
-/* You can add global styles to this file, and also import other style files */
+@import "nes.css/css/nes.min.css";
+
+html, body {
+    background-color: #000;   
+    color: #fff;              
+}
+
+ html, body, pre, code, kbd, samp {
+    font-family: "Press Start 2P";
+    image-rendering: pixelated; 
+  }

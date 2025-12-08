@@ -1,0 +1,22 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; // center vertically
+    align-items: center; 
+    min-height: 100vh;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+.landing-shell {
+    max-width: 640px;
+    width: 100%;
+}
+
+.label-input {
+    padding-left: 10px;
+}
+
+h1 {
+    text-align: center;
+}
