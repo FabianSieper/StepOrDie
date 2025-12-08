@@ -1,13 +1,19 @@
 package main
 
-import "github.com/FabianSieper/NotionQuest/internal/notion"
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/FabianSieper/NotionQuest/internal/api"
+)
 
 func main() {
-	resp, err := notion.GetPublicNotionPageContent("https://fabiansieper.notion.site/Notion-Quest-2c25e55239fb80f78f9df3fa2c2d65d1")
+	fmt.Printf("INFO - Backend is starting\n")
 
-	if err != nil {
-		panic(err)
-	}
+	// Example: https://fabiansieper.notion.site/Notion-Quest-2c25e55239fb80f78f9df3fa2c2d65d1
+	http.HandleFunc("/loadNotionGame", api.LoadNotionGameHandler)
 
-	println(resp)
+	http.ListenAndServe(":8080", nil)
+
+	fmt.Printf("INFO - Backend has stopped\n")
 }

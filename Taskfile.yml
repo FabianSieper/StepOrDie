@@ -1,6 +1,19 @@
 version: '3'
 
 tasks:
+  default:
+    desc: "List all available tasks"
+    cmds:
+      - task --list
+
   run-backend: 
     cmds:
       - cd backend && go run main.go
+
+  test-loadnotiongame:
+    desc: "Send a sample request to /loadNotionGame (backend must be running)"
+    cmds:
+      - |
+        curl -X GET http://localhost:8080/loadNotionGame \
+          -H 'Content-Type: application/json' \
+          --data '{"notionUrl":"https://fabiansieper.notion.site/Notion-Quest-2c25e55239fb80f78f9df3fa2c2d65d1"}'

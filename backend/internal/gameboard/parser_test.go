@@ -13,8 +13,8 @@ func TestParseScenarioInvalidRowLength(t *testing.T) {
 	if err == nil {
 		t.Fatalf("ParseScenario should fail on inconsistent row lengths")
 	}
-	if !strings.Contains(err.Error(), "same length") {
-		t.Fatalf("expected row length error, got %v", err)
+	if !strings.Contains(err.Error(), `row 1 ("#")`) {
+		t.Fatalf("expected detailed row length error, got %v", err)
 	}
 }
 
@@ -90,5 +90,69 @@ func TestParseTileInvalid(t *testing.T) {
 	}
 	if tile != models.TileUnknown {
 		t.Fatalf("parseTile('X') returned tile %v, expected %v", tile, models.TileUnknown)
+	}
+}
+
+func TestSanitizeRowsRemovesZeroWidthSpaces(t *testing.T) {
+	rows := []string{
+		"#\u200b#",
+		"\u200bS.\u200b",
+	}
+
+	cleaned := sanitizeRows(rows)
+
+	expected := []string{
+		"##",
+		"S.",
+	}
+
+	if len(cleaned) != len(expected) {
+		t.Fatalf("sanitizeRows returned unexpected length: got %d expected %d", len(cleaned), len(expected))
+	}
+
+	for i := range expected {
+		if cleaned[i] != expected[i] {
+			t.Fatalf("sanitizeRows row %d = %q, expected %q", i, cleaned[i], expected[i])
+		}
+	}
+}
+
+func TestSanitizeRowsDropsNonTileCharacters(t *testing.T) {
+	rows := []string{
+		"  #S.\t",
+		"\rMZ!$#",
+	}
+
+	cleaned := sanitizeRows(rows)
+	expected := []string{
+		"#S.",
+		"MZ#",
+	}
+
+	for i := range expected {
+		if cleaned[i] != expected[i] {
+			t.Fatalf("sanitizeRows row %d = %q, expected %q", i, cleaned[i], expected[i])
+		}
+	}
+}
+
+func TestSanitizeRowsDropsEmptyRows(t *testing.T) {
+	rows := []string{
+		"",
+		"####################",
+		"   ",
+		"S.................#",
+	}
+
+	cleaned := sanitizeRows(rows)
+
+	if len(cleaned) != 2 {
+		t.Fatalf("sanitizeRows should drop empty rows, got %d rows", len(cleaned))
+	}
+	if cleaned[0] != "####################" {
+		t.Fatalf("unexpected first row %q", cleaned[0])
+	}
+	if cleaned[1] != "S.................#" {
+		t.Fatalf("unexpected second row %q", cleaned[1])
 	}
 }

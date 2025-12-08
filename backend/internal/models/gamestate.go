@@ -26,7 +26,6 @@ const (
 type Player struct {
 	Position Position `json:"position"`
 	HP       int      `json:"hp"`
-	// TODO: inventory, name, etc.
 }
 
 type Monster struct {

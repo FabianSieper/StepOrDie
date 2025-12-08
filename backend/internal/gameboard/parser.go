@@ -3,6 +3,7 @@ package gameboard
 import (
 	"fmt"
 	"strings"
+	"unicode"
 
 	"github.com/FabianSieper/NotionQuest/internal/models"
 )
@@ -21,6 +22,8 @@ var playGroundSize = 20
 // ####################
 func ParseScenario(raw string) (*models.GameState, error) {
 	rows := strings.Split(raw, "\n")
+	rows = sanitizeRows(rows)
+
 	amountRows, amountCols, err := getAmountRowsAndCols(rows)
 
 	if err != nil {
@@ -107,8 +110,8 @@ func getAmountRowsAndCols(rows []string) (int, int, error) {
 		return 0, 0, fmt.Errorf("the amount of rows is too small: %d. The minimum is 2", amountRows)
 	}
 
-	if !allRowsSameLength(rows) {
-		return 0, 0, fmt.Errorf("not all rows have the same length")
+	if err := ensureRowsSameLength(rows); err != nil {
+		return 0, 0, err
 	}
 
 	amountCols := len(rows[0])
@@ -124,11 +127,47 @@ func getAmountRowsAndCols(rows []string) (int, int, error) {
 	return amountRows, amountCols, nil
 }
 
-func allRowsSameLength(rows []string) bool {
-	for _, row := range rows {
-		if len(row) != len(rows[0]) {
-			return false
+func ensureRowsSameLength(rows []string) error {
+	if len(rows) == 0 {
+		return nil
+	}
+	expectedLength := len(rows[0])
+
+	for idx, row := range rows {
+		if len(row) != expectedLength {
+			return fmt.Errorf("row %d (%q) has length %d, expected %d", idx, row, len(row), expectedLength)
 		}
 	}
-	return true
+	return nil
+}
+
+func sanitizeRows(rows []string) []string {
+	cleaned := make([]string, 0, len(rows))
+	for _, row := range rows {
+		s := sanitizeRow(row)
+		if s == "" {
+			continue
+		}
+		cleaned = append(cleaned, s)
+	}
+
+	return cleaned
+}
+
+func sanitizeRow(row string) string {
+	var cleaned strings.Builder
+	cleaned.Grow(len(row))
+	for _, r := range row {
+		switch {
+		case unicode.In(r, unicode.Cf):
+			continue
+		case r == '\r' || r == '\t':
+			continue
+		default:
+			if _, ok := tileMappings[r]; ok {
+				cleaned.WriteRune(r)
+			}
+		}
+	}
+	return cleaned.String()
 }
