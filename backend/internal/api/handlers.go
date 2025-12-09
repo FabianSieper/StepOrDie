@@ -11,8 +11,8 @@ import (
 
 func LoadNotionGameHandler(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method != http.MethodGet {
-		http.Error(w, fmt.Sprintf("only GET method is allowed: received %s", r.Method), http.StatusMethodNotAllowed)
+	if r.Method != http.MethodPost {
+		http.Error(w, fmt.Sprintf("only POST method is allowed: received %s", r.Method), http.StatusMethodNotAllowed)
 		return
 	}
 

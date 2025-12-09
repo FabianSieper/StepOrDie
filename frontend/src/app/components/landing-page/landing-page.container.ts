@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
+import { BackendService } from '../../services/backend.service';
 import { LandingPageComponent } from './landing-page.component';
 
 @Component({
@@ -11,10 +12,18 @@ import { LandingPageComponent } from './landing-page.component';
 })
 export class LandingPageContainer {
   private logger = inject(NGXLogger);
+  private backendService = inject(BackendService);
 
   protected readonly notionUrl = signal<string>('');
 
-  protected handleEnterClick() {
+  protected async handleEnterClick() {
     this.logger.info('Notion URL submitted:', this.notionUrl());
+
+    try {
+      const response = await this.backendService.getInitialPlayingBoard(this.notionUrl());
+      console.log(response);
+    } catch (error) {
+      this.logger.error('Error loading initial playing board:', error);
+    }
   }
 }

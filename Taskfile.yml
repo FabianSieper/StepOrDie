@@ -10,7 +10,11 @@ tasks:
     cmds:
       - cd backend && go run main.go
 
-  test-loadnotiongame:
+  run-frontend:
+    cmds:
+      - cd frontend && ng serve
+
+  test-load-notion-game:
     desc: "Send a sample request to /loadNotionGame (backend must be running)"
     cmds:
       - |
