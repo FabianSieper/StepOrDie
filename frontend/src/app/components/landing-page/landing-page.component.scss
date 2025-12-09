@@ -17,6 +17,11 @@
     padding-left: 10px;
 }
 
+.nes-input {
+  font-family: 'Press Start 2P', system-ui, sans-serif;
+  caret-color: #32ff7e; /* neon green arcade caret */
+}
+
 .input-line {
     display: flex;
     align-items: center;

@@ -1,7 +1,7 @@
 import { Component, model, output } from '@angular/core';
 
 @Component({
-  selector: 'app-landing-page',
+  selector: 'app-landing-page-component',
   imports: [],
   template: `
     <section class="nes-container is-rounded landing-shell">
@@ -15,8 +15,10 @@ import { Component, model, output } from '@angular/core';
             type="text"
             class="nes-input"
             placeholder="Enter public Notion Page URL"
+            [value]="notionUrl()"
+            (input)="onNotionUrlInput($event)"
           />
-          <button (click)="submitQuest.emit()" class="pixel-button"></button>
+          <button type="button" (click)="submitQuest.emit()" class="pixel-button"></button>
         </div>
       </div>
     </section>
@@ -26,4 +28,9 @@ import { Component, model, output } from '@angular/core';
 export class LandingPageComponent {
   readonly notionUrl = model.required<string>();
   readonly submitQuest = output<void>();
+
+  protected onNotionUrlInput(event: Event): void {
+    const value = (event.target as HTMLInputElement | null)?.value ?? '';
+    this.notionUrl.set(value);
+  }
 }
