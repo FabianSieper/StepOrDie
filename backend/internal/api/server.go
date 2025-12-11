@@ -37,6 +37,23 @@ func (s *Server) LoadNotionGameHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	responseBody, err := gameboard.ExtractPageIdFromNotionUrl(requestBody.NotionUrl)
+
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to extract page ID from Notion URL: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	_, ok := s.Cache.Get(responseBody.PageId)
+
+	// Still continue and overwrite if user sent an corresponding parameter = true
+	if ok && !requestBody.Overwrite {
+		http.Error(w, fmt.Sprintf("Game with page ID %s already exists in cache", responseBody.PageId), http.StatusConflict)
+		return
+	} else if ok {
+		fmt.Printf("INFO - Overwriting existing game with page ID %s\n", responseBody.PageId)
+	}
+
 	resp, err := notion.GetPublicNotionPageContent(requestBody.NotionUrl)
 
 	if err != nil {
@@ -51,14 +68,6 @@ func (s *Server) LoadNotionGameHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Failed to parse Notion page content into game field: %v", err), http.StatusInternalServerError)
 		return
 	}
-	responseBody, err := gameboard.ExtractPageIdFromNotionUrl(requestBody.NotionUrl)
-
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to extract page ID from Notion URL: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	// TODO: fail if the pageid is already set so that the user can choose in the frontend if they want to overwrite or load the game state
 
 	// Store the parsed game field in the cache
 	s.Cache.Set(responseBody.PageId, *parsedGameField)
@@ -70,5 +79,4 @@ func (s *Server) LoadNotionGameHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Failed to encode response: %v", err), http.StatusInternalServerError)
 		return
 	}
-
 }

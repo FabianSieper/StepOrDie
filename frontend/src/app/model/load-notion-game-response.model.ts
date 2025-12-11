@@ -20,10 +20,5 @@ export interface Monster {
 }
 
 export interface LoadNotionGameResponse {
-  width: number;
-  height: number;
-  status: GameStatus;
-  grid: TileType[][];
-  player: Player;
-  monsters: Monster[];
+  pageId: string;
 }

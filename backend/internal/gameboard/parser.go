@@ -66,8 +66,14 @@ func ExtractPageIdFromNotionUrl(notionUrl string) (models.LoadNotionResponseBody
 		return models.LoadNotionResponseBody{PageId: ""}, fmt.Errorf("invalid Notion URL: %s", notionUrl)
 	}
 
-	// TODO:
-	return models.LoadNotionResponseBody{PageId: ""}, nil
+	// Remove query parameter at the end
+	if strings.ContainsRune(parts[len(parts)-1], '?') {
+		// select first part before ? of Notion-Quest-2c25e55239fb80f78f9df3fa2c2d65d1?source=copy_link
+		subParts := strings.Split(parts[len(parts)-1], "?")
+		return models.LoadNotionResponseBody{PageId: subParts[0]}, nil
+	}
+
+	return models.LoadNotionResponseBody{PageId: parts[len(parts)-1]}, nil
 }
 
 func getPlayerPosition(rows []string) (models.Position, error) {
