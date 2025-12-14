@@ -25,14 +25,18 @@ const (
 
 type Player struct {
 	Position Position `json:"position"`
-	HP       int      `json:"hp"`
 }
 
-type Monster struct {
-	ID       string   `json:"id"` // Needed for Angular trackBy (e.g. "monster_1")
-	Position Position `json:"position"`
-	Type     string   `json:"type"`   // e.g. "Slime" or "Orc" (different sprites)
-	IsDead   bool     `json:"isDead"` // Allows the frontend to trigger a death animation
+type EnemyType string
+
+const (
+	EnemyTypeMonster EnemyType = "MONSTER"
+)
+
+type Enemy struct {
+	ID       string    `json:"id"` // Needed for Angular trackBy (e.g. "enemy_1")
+	Position Position  `json:"position"`
+	Type     EnemyType `json:"type"`
 }
 
 // 3. The full picture (game state)
@@ -41,9 +45,8 @@ type Monster struct {
 // GameState is the object returned by the API endpoint.
 type GameState struct {
 	// Metadata
-	Width  int    `json:"width"`
-	Height int    `json:"height"`
-	Status string `json:"status"` // "PLAYING", "WON", "GAME_OVER"
+	Width  int `json:"width"`
+	Height int `json:"height"`
 
 	// Layer 0: the static map
 	// Represented as a 2D array of strings.
@@ -52,6 +55,6 @@ type GameState struct {
 	Grid [][]TileType `json:"grid"`
 
 	// Layer 1: dynamic actors
-	Player   Player    `json:"player"`
-	Monsters []Monster `json:"monsters"`
+	Player  Player  `json:"player"`
+	Enemies []Enemy `json:"enemies"`
 }

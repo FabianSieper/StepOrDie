@@ -44,17 +44,37 @@ func ParseScenario(raw string) (*models.GameState, error) {
 		return &models.GameState{}, err
 	}
 
+	enemies := extractEnemies(rows)
+
 	return &models.GameState{
 		Width:  amountCols,
 		Height: amountRows,
 		Grid:   grid,
 		Player: models.Player{
 			Position: playerPosition,
-			HP:       10,
 		},
-		Monsters: []models.Monster{},
-		Status:   "PLAYING",
+		Enemies: enemies,
 	}, nil
+}
+
+func extractEnemies(rows []string) []models.Enemy {
+	enemies := make([]models.Enemy, 0)
+	index := 1
+	for y, row := range rows {
+		for x, char := range row {
+			if char == 'M' {
+				enemyId := fmt.Sprintf("enemy_%d", index)
+				enemies = append(enemies, models.Enemy{
+					ID:       enemyId,
+					Position: models.Position{X: x, Y: y},
+					Type:     models.EnemyTypeMonster,
+				})
+				index++
+			}
+		}
+	}
+
+	return enemies
 }
 
 func ExtractPageIdFromNotionUrl(notionUrl string) (models.LoadNotionResponseBody, error) {

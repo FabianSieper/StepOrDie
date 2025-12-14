@@ -60,6 +60,10 @@ export class GameService {
     this.drawGameElement(ctx, this._game()?.player, this._game()?.playingBoard);
   }
 
+  private drawEnemies(ctx: CanvasRenderingContext2D, enemies: GameElement[]) {
+    // TODO
+  }
+
   private drawGameElement(
     ctx: CanvasRenderingContext2D,
     gameElement?: GameElement,

@@ -1,5 +1,6 @@
 export interface Game {
   player: GameElement;
+  enemies: GameElement;
   playingBoard: PlayingBoard;
 }
 
