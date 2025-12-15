@@ -1,13 +1,24 @@
-import { Component, effect, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  effect,
+  inject,
+  OnDestroy,
+  signal,
+  ViewChild,
+  WritableSignal,
+} from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { GameService } from '../../services/game.service';
+import { GameComponent } from './game.component';
 
 @Component({
   selector: 'app-game-container',
-  imports: [],
-  template: ` <canvas #playfield width="640" height="640"></canvas> `,
+  providers: [GameComponent],
+  imports: [GameComponent],
+  template: ` <app-game-component /> `,
 })
-export class GameContainer implements OnDestroy {
+export class GameContainer implements OnDestroy, AfterViewInit {
   private readonly gameService = inject(GameService);
   private readonly logger = inject(NGXLogger);
 
@@ -21,22 +32,26 @@ export class GameContainer implements OnDestroy {
   private rafId: number | undefined = undefined;
 
   // The context for rendering on the canvas
-  private ctx: CanvasRenderingContext2D | undefined = undefined;
+  private readonly ctx: WritableSignal<CanvasRenderingContext2D | undefined> = signal(undefined);
 
-  @ViewChild('playfield', { static: true })
-  private canvas?: ElementRef<HTMLCanvasElement>;
+  @ViewChild(GameComponent)
+  private gameComponent?: GameComponent;
+
+  ngAfterViewInit(): void {
+    const gameComponent = this.gameComponent;
+    if (!gameComponent) return;
+
+    this.ctx.set(gameComponent.playfield?.getContext('2d') ?? undefined);
+  }
 
   private readonly startAnimationLoopEffect = effect(() => {
-    if (this.gameService.isGameDefined() && this.canvas) {
-      this.ctx = this.canvas.nativeElement.getContext('2d') ?? undefined;
+    if (!this.ctx()) return;
+
+    if (this.gameService.isGameDefined()) {
       this.logger.info('Starting animation loop');
       this.startAnimationLoop();
     } else {
-      this.logger.warn(
-        `Not starting animation loop because either game or canvas is not defined. Game defined: ${JSON.stringify(
-          this.gameService.isGameDefined()
-        )}, canvas: ${JSON.stringify(this.canvas)}`
-      );
+      this.logger.info(`Not starting animation loop because game is not defined.`);
     }
   });
 
@@ -44,7 +59,7 @@ export class GameContainer implements OnDestroy {
     const loop = (timestamp: number) => {
       if (timestamp - this.lastDraw >= this.frameInterval) {
         this.lastDraw = timestamp;
-        this.gameService.computationStep(this.ctx);
+        this.gameService.computationStep(this.ctx());
       }
       this.rafId = requestAnimationFrame(loop);
     };
