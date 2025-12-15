@@ -1,4 +1,4 @@
-import { GameState } from '../../model/load-game-state-response.model';
+import { Enemy, GameState } from '../../model/load-game-state-response.model';
 import { Game, GameElement, PlayingBoard, SpriteDetails } from '../model/game.model';
 
 var playingBoardPixelsX = 1000;
@@ -7,6 +7,7 @@ var playingBoardPixelsY = 1000;
 export async function mapToGame(gameState: GameState): Promise<Game> {
   return {
     player: await extractPlayer(gameState),
+    enemies: await extractEnemies(gameState),
     playingBoard: extractPlayingBoard(gameState),
   };
 }
@@ -20,9 +21,14 @@ function extractPlayingBoard(gameState: GameState): PlayingBoard {
   };
 }
 
-async function extractPlayer(gameState: GameState): Promise<GameElement> {
-  const playerSpriteDetails = await createSpriteDetails(
-    'assets/sprites/player.png',
+async function extractEnemies(gameState: GameState): Promise<GameElement[]> {
+  const enemyImage = await loadAssetAsImage('assets/sprites/enemy.png');
+  return Promise.all(gameState.enemies.map((enemy) => mapEnemy(enemy, enemyImage)));
+}
+
+async function mapEnemy(enemy: Enemy, enemyImage: HTMLImageElement): Promise<GameElement> {
+  const spriteDetails: SpriteDetails = createSpriteDetails(
+    enemyImage,
     3, // cols
     5, // rows
     // Start at animation frame col 0 and row 4
@@ -30,28 +36,47 @@ async function extractPlayer(gameState: GameState): Promise<GameElement> {
     4
   );
   return {
-    spriteDetails: playerSpriteDetails,
+    spriteDetails,
+    position: { ...enemy.position },
+  };
+}
+
+async function extractPlayer(gameState: GameState): Promise<GameElement> {
+  const playerImage = await loadAssetAsImage('assets/sprites/player.png');
+  const spriteDetails = createSpriteDetails(
+    playerImage,
+    3, // cols
+    5, // rows
+    // Start at animation frame col 0 and row 4
+    0,
+    4
+  );
+  return {
+    spriteDetails,
     position: { x: gameState.player.position.x, y: gameState.player.position.y },
   };
 }
 
-async function createSpriteDetails(
-  assetsPath: string,
+async function loadAssetAsImage(path: string) {
+  const image = new Image();
+  image.src = path;
+  await image.decode();
+  return image;
+}
+
+function createSpriteDetails(
+  image: HTMLImageElement,
   spriteCols: number,
   spriteRows: number,
   nextAnimationCol: number,
   nextAnimationRow: number
-): Promise<SpriteDetails> {
-  const player = new Image();
-  player.src = assetsPath;
-  await player.decode();
-
+): SpriteDetails {
   return {
-    image: player,
+    image,
     amountCols: spriteCols,
     amountRows: spriteRows,
-    frameWidth: Math.floor(player.naturalWidth / spriteCols),
-    frameHeight: Math.floor(player.naturalHeight / spriteRows),
+    frameWidth: Math.floor(image.naturalWidth / spriteCols),
+    frameHeight: Math.floor(image.naturalHeight / spriteRows),
     nextAnimationCol,
     nextAnimationRow,
   };

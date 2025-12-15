@@ -55,13 +55,18 @@ export class GameService {
   private drawGame(ctx: CanvasRenderingContext2D) {
     // TODO: draw board
     // TODO: draw enemies
-
+    this.drawEnemies(ctx, this._game()?.enemies, this._game()?.playingBoard);
     // Draw player
     this.drawGameElement(ctx, this._game()?.player, this._game()?.playingBoard);
   }
 
-  private drawEnemies(ctx: CanvasRenderingContext2D, enemies: GameElement[]) {
+  private drawEnemies(
+    ctx: CanvasRenderingContext2D,
+    enemies?: GameElement[],
+    playingBoard?: PlayingBoard
+  ) {
     // TODO
+    enemies?.forEach((enemy) => this.drawGameElement(ctx, enemy, playingBoard));
   }
 
   private drawGameElement(
