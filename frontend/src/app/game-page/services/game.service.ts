@@ -25,36 +25,29 @@ export class GameService {
 
   private animateGame() {
     this.animatePlayer();
-
-    // TODO: animate enemies
+    this.animateEnemies();
 
     // TODO: animate playing board?
   }
 
   private animatePlayer() {
-    const game = this._game();
+    const game = this.verifyGameIsDefined();
+    this.animateGameElement(game.player);
+  }
 
-    if (!game) {
-      this.logger.warn('Cannot animate player, as game is undefined');
-      return;
-    }
+  private animateEnemies() {
+    const game = this.verifyGameIsDefined();
+    game.enemies.forEach((enemy) => this.animateGameElement(enemy));
+  }
 
-    const player: GameElement = game.player;
-    if (!player) {
-      this.logger.warn('Cannot animate player, as player is undefined');
-      return;
-    }
-
+  private animateGameElement(gameElement: GameElement) {
     // Move from left to right and back within a sprite row
-    player.spriteDetails.nextAnimationCol =
-      (player.spriteDetails.nextAnimationCol + 1) % player.spriteDetails.amountCols;
-
-    this._game.set({ ...game, player });
+    gameElement.spriteDetails.nextAnimationCol =
+      (gameElement.spriteDetails.nextAnimationCol + 1) % gameElement.spriteDetails.amountCols;
   }
 
   private drawGame(ctx: CanvasRenderingContext2D) {
     // TODO: draw board
-    // TODO: draw enemies
     this.drawEnemies(ctx, this._game()?.enemies, this._game()?.playingBoard);
     // Draw player
     this.drawGameElement(ctx, this._game()?.player, this._game()?.playingBoard);
@@ -65,7 +58,6 @@ export class GameService {
     enemies?: GameElement[],
     playingBoard?: PlayingBoard
   ) {
-    // TODO
     enemies?.forEach((enemy) => this.drawGameElement(ctx, enemy, playingBoard));
   }
 
@@ -135,5 +127,14 @@ export class GameService {
   private clearDrawingBoard(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = '#333';
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  }
+
+  private verifyGameIsDefined() {
+    const game = this._game();
+
+    if (!game) {
+      throw new Error('Cannot animate player, as game is undefined');
+    }
+    return game;
   }
 }
