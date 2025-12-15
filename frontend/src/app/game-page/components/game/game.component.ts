@@ -3,11 +3,7 @@ import { Component, ElementRef, input, ViewChild } from '@angular/core';
 @Component({
   selector: 'app-game-component',
   imports: [],
-  template: `
-    <section class="nes-container is-rounded">
-      <canvas #playfield [width]="canvasWidth()" [height]="canvasHeight()"></canvas>
-    </section>
-  `,
+  template: ` <canvas #playfield [width]="canvasWidth()" [height]="canvasHeight()"></canvas> `,
   styleUrl: './game.component.scss',
 })
 export class GameComponent {

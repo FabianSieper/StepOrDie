@@ -14,7 +14,7 @@ import { InfoMessageDetail } from './model/info-message.model';
     DuplicateDialogComponent,
   ],
   template: `
-    <section class="nes-container is-rounded landing-shell">
+    <section class="nes-container is-rounded landing-shell is-dark">
       <h1>Welcome to NotionQuest!</h1>
 
       <div class="nes-field">
