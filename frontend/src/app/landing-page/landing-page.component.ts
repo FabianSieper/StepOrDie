@@ -1,12 +1,18 @@
-import { Component, ElementRef, input, model, output, ViewChild } from '@angular/core';
+import { Component, input, model, output, ViewChild } from '@angular/core';
 import { InfoMessageComponent } from '../components/info-message/info-message.component';
 import { LoadingYourQuestOverlayComponent } from '../components/loading-your-quest-overlay/loading-your-quest-overlay.component';
 import { OverlayComponent } from '../components/overlay/overlay.component';
+import { DuplicateDialogComponent } from './components/duplicate-dialog/duplicate-dialog.component';
 import { InfoMessageDetail } from './model/info-message.model';
 
 @Component({
   selector: 'app-landing-page-component',
-  imports: [InfoMessageComponent, OverlayComponent, LoadingYourQuestOverlayComponent],
+  imports: [
+    InfoMessageComponent,
+    OverlayComponent,
+    LoadingYourQuestOverlayComponent,
+    DuplicateDialogComponent,
+  ],
   template: `
     <section class="nes-container is-rounded landing-shell">
       <h1>Welcome to NotionQuest!</h1>
@@ -29,6 +35,8 @@ import { InfoMessageDetail } from './model/info-message.model';
       <app-info-message [infoMessageDetails]="details" />
       }
     </section>
+
+    <!-- TODO: also use dialogs for these -->
     @if (isLoading()) {
     <app-loading-your-quest-overlay-component [translateY]="140" />
     } @else if (loadedSuccessfully()) {
@@ -37,18 +45,11 @@ import { InfoMessageDetail } from './model/info-message.model';
     </app-overlay>
     }
 
-    <dialog #duplicateDialog class="nes-dialog is-dark">
-      <form method="dialog">
-        <p class="title">Attention!</p>
-        <p>The to be laoded game was already loaded in the past</p>
-        <p>Do you want do you want to do?</p>
-        <menu class="dialog-menu">
-          <button class="nes-btn">Cancel</button>
-          <button class="nes-btn" (click)="overwriteGame.emit()">Overwrite</button>
-          <button class="nes-btn is-primary" (click)="loadGame.emit()">Load</button>
-        </menu>
-      </form>
-    </dialog>
+    <app-duplicate-dialog-component
+      #duplicateDialog
+      (overwriteGame)="overwriteGame.emit()"
+      (loadGame)="loadGame.emit()"
+    />
   `,
   styleUrl: './landing-page.component.scss',
 })
@@ -61,11 +62,11 @@ export class LandingPageComponent {
   readonly overwriteGame = output<void>();
   readonly loadGame = output<void>();
 
-  @ViewChild('duplicateDialog')
-  private duplicateDialog?: ElementRef<HTMLDialogElement>;
+  @ViewChild(DuplicateDialogComponent)
+  private dupDialog?: DuplicateDialogComponent;
 
-  get dialog(): HTMLDialogElement | undefined {
-    return this.duplicateDialog?.nativeElement;
+  get duplicateDialog(): DuplicateDialogComponent | undefined {
+    return this.dupDialog;
   }
 
   protected onNotionUrlInput(event: Event): void {

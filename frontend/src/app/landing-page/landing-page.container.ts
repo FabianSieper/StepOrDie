@@ -103,7 +103,7 @@ export class LandingPageContainer {
 
     // HTTP 409 indicates that there is already a game for the provided Notion page
     if (error.message.includes('409')) {
-      this.landingPageComponent?.dialog?.showModal();
+      this.landingPageComponent?.duplicateDialog?.dialog?.showModal();
       this.lastDuplicateNotionPageId = this.extractNotionPageId(this.notionUrl());
     } else {
       this.setErrorRequestInfo();

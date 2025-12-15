@@ -27,17 +27,6 @@
     align-items: center;
 }
 
-.dialog-menu {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-
-.pixel-button:active {
-    background-image: url('/assets/enter-button-pressed.png');
-    transform: translateY(2px);
-}
-
 .translateUp {
     transform: translateY(140px);
 }
