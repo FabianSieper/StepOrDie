@@ -1,18 +1,12 @@
 import { Component, input, model, output, ViewChild } from '@angular/core';
 import { InfoMessageComponent } from '../components/info-message/info-message.component';
-import { OverlayComponent } from '../components/overlay/overlay.component';
 import { DuplicateDialogComponent } from './components/duplicate-dialog/duplicate-dialog.component';
 import { LoadingDialogComponent } from './components/loading-dialog/loading-dialog.component';
 import { InfoMessageDetail } from './model/info-message.model';
 
 @Component({
   selector: 'app-landing-page-component',
-  imports: [
-    InfoMessageComponent,
-    OverlayComponent,
-    DuplicateDialogComponent,
-    LoadingDialogComponent,
-  ],
+  imports: [InfoMessageComponent, DuplicateDialogComponent, LoadingDialogComponent],
   template: `
     <section class="nes-container is-rounded landing-shell is-dark">
       <h1>Welcome to NotionQuest!</h1>
@@ -35,15 +29,7 @@ import { InfoMessageDetail } from './model/info-message.model';
       <app-info-message [infoMessageDetails]="details" />
       }
     </section>
-
-    <app-loading-dialog-component #loadingDialog />
-    @if (loadedSuccessfully()) {
-    <!-- TODO: also use dialogs for this -->
-    <app-overlay>
-      <h1 class="translateUp" slot="slot">{{ 'Loaded with Success!' }}</h1>
-    </app-overlay>
-    }
-
+    <app-loading-dialog-component #loadingDialog [success]="loadedSuccessfully()" />
     <app-duplicate-dialog-component
       #duplicateDialog
       (overwriteGame)="overwriteGame.emit()"

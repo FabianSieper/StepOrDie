@@ -1,20 +1,22 @@
-import { Component, ElementRef, OnDestroy, OnInit, output, signal, ViewChild } from '@angular/core';
+import { Component, input, OnDestroy, OnInit, output, signal, ViewChild } from '@angular/core';
+import { UnifiedDialogComponent } from '../unified-dialog/unified-dialog.component';
 
 @Component({
   selector: 'app-loading-dialog-component',
-  imports: [],
+  imports: [UnifiedDialogComponent],
+  providers: [UnifiedDialogComponent],
   template: `
-    <dialog #loadingDialog class="nes-dialog is-dark">
-      <form method="dialog">
-        <div class="title">
-          Loading<span class="loading-dots">{{ dots() }}</span>
-        </div>
-      </form>
-    </dialog>
+    <app-unified-dialog-component>
+      <div class="title">
+        @if(success()) { Success! } @else { Loading<span class="loading-dots">{{ dots() }}</span>
+        }
+      </div>
+    </app-unified-dialog-component>
   `,
   styleUrl: './loading-dialog.component.scss',
 })
 export class LoadingDialogComponent implements OnInit, OnDestroy {
+  readonly success = input<boolean>(false);
   readonly overwriteGame = output<void>();
   readonly loadGame = output<void>();
 
@@ -25,11 +27,11 @@ export class LoadingDialogComponent implements OnInit, OnDestroy {
   private increasingAnimation = true;
   private animationIntervalid: number | undefined = undefined;
 
-  @ViewChild('loadingDialog')
-  private loadingDialog?: ElementRef<HTMLDialogElement>;
+  @ViewChild(UnifiedDialogComponent)
+  private loadingDialog?: UnifiedDialogComponent;
 
   get dialog(): HTMLDialogElement | undefined {
-    return this.loadingDialog?.nativeElement;
+    return this.loadingDialog?.dialog;
   }
 
   ngOnInit(): void {

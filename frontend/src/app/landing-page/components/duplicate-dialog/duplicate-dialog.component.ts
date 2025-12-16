@@ -1,11 +1,13 @@
-import { Component, ElementRef, output, ViewChild } from '@angular/core';
+import { Component, output, ViewChild } from '@angular/core';
+import { UnifiedDialogComponent } from '../unified-dialog/unified-dialog.component';
 
 @Component({
   selector: 'app-duplicate-dialog-component',
-  imports: [],
+  imports: [UnifiedDialogComponent],
+  providers: [UnifiedDialogComponent],
   template: `
-    <dialog #duplicateDialog class="nes-dialog is-dark">
-      <form method="dialog">
+    <app-unified-dialog-component>
+      <div>
         <p class="title">Attention!</p>
         <p>The to be loaded game was already loaded in the past</p>
         <p>Do you want do you want to do?</p>
@@ -14,8 +16,8 @@ import { Component, ElementRef, output, ViewChild } from '@angular/core';
           <button class="nes-btn" (click)="overwriteGame.emit()">Overwrite</button>
           <button class="nes-btn is-primary" (click)="loadGame.emit()">Load</button>
         </menu>
-      </form>
-    </dialog>
+      </div>
+    </app-unified-dialog-component>
   `,
   styleUrl: './duplicate-dialog.component.scss',
 })
@@ -23,10 +25,10 @@ export class DuplicateDialogComponent {
   readonly overwriteGame = output<void>();
   readonly loadGame = output<void>();
 
-  @ViewChild('duplicateDialog')
-  private duplicateDialog?: ElementRef<HTMLDialogElement>;
+  @ViewChild(UnifiedDialogComponent)
+  private unifiedDialogComponent?: UnifiedDialogComponent;
 
   get dialog(): HTMLDialogElement | undefined {
-    return this.duplicateDialog?.nativeElement;
+    return this.unifiedDialogComponent?.dialog;
   }
 }

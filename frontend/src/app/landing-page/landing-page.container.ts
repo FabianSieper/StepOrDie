@@ -40,6 +40,7 @@ export class LandingPageContainer {
   protected async handleEnterClick() {
     this.infoMessageDetails.set(undefined);
     this.loadedSuccessfully.set(false);
+    this.lastDuplicateNotionPageId = undefined;
 
     this.logger.info('Notion URL submitted:', this.notionUrl());
 
@@ -85,8 +86,6 @@ export class LandingPageContainer {
       this.forwardUserToGamePage(response.pageId, 2500);
     } catch (error) {
       this.handleError(error as Error);
-    } finally {
-      this.landingPageComponent?.loadingDialog?.dialog?.requestClose();
     }
   }
 
@@ -102,8 +101,10 @@ export class LandingPageContainer {
     // HTTP 409 indicates that there is already a game for the provided Notion page
     if (error.message.includes('409')) {
       this.landingPageComponent?.duplicateDialog?.dialog?.showModal();
+      // Store notion URL for later
       this.lastDuplicateNotionPageId = this.extractNotionPageId(this.notionUrl());
     } else {
+      // TODO: display error via thingy
       this.setErrorRequestInfo();
     }
   }
