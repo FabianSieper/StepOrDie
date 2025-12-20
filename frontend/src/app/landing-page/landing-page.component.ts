@@ -1,5 +1,5 @@
 import { Component, input, model, output, ViewChild } from '@angular/core';
-import { InfoDialogComponent } from '../components/loading-your-quest-overlay/info-dialog/info-dialog.component';
+import { InfoDialogComponent } from '../components/info-dialog/info-dialog.component';
 import { MessageDialogComponent } from '../components/message-dialog/message-dialog.component';
 import { DialogType } from '../game-page/game-page.component';
 
@@ -25,7 +25,12 @@ import { DialogType } from '../game-page/game-page.component';
         </div>
       </div>
     </section>
-    <app-info-dialog-component [displayDialogType]="displayDialogType()" />
+    <app-info-dialog-component
+      [displayDialogType]="displayDialogType()"
+      (resetActiveDialogType)="resetActiveDialogType.emit()"
+      (loadGame)="loadGame.emit()"
+      (overwriteGame)="overwriteGame.emit()"
+    />
   `,
   styleUrl: './landing-page.component.scss',
 })
@@ -35,6 +40,7 @@ export class LandingPageComponent {
   readonly submitQuest = output<void>();
   readonly overwriteGame = output<void>();
   readonly loadGame = output<void>();
+  readonly resetActiveDialogType = output();
 
   @ViewChild(MessageDialogComponent)
   private _messageDialog?: MessageDialogComponent;

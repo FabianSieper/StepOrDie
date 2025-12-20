@@ -14,6 +14,7 @@ import { GameService } from './services/game.service';
   template: ` <app-game-page-component
     [isInitialGameStateLoading]="isInitialGameStateLoading()"
     [displayDialogType]="displayDialogType()"
+    (resetActiveDialogType)="this.displayDialogType.set(undefined)"
   />`,
 })
 export class GamePageContainer {

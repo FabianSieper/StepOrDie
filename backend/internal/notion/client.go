@@ -3,7 +3,6 @@ package notion
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/url"
 	"strings"
 	"time"
@@ -57,7 +56,7 @@ func GetPublicNotionPageContent(pageUrl string) (string, error) {
 	)
 
 	if err != nil {
-		log.Fatal(err)
+		return "", fmt.Errorf("Failed to fetch content of Notion page. Cause: %s", err)
 	}
 
 	// 4. Clean the result and emit it.

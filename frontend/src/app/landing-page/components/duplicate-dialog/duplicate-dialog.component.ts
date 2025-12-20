@@ -12,7 +12,7 @@ import { UnifiedDialogComponent } from '../../../components/unified-dialog/unifi
         <p>The to be loaded game was already loaded in the past</p>
         <p>Do you want do you want to do?</p>
         <menu class="dialog-menu">
-          <button class="nes-btn">Cancel</button>
+          <button class="nes-btn" (click)="resetActiveDialogType.emit()">Cancel</button>
           <button class="nes-btn" (click)="overwriteGame.emit()">Overwrite</button>
           <button class="nes-btn is-primary" (click)="loadGame.emit()">Load</button>
         </menu>
@@ -24,6 +24,7 @@ import { UnifiedDialogComponent } from '../../../components/unified-dialog/unifi
 export class DuplicateDialogComponent {
   readonly overwriteGame = output<void>();
   readonly loadGame = output<void>();
+  readonly resetActiveDialogType = output();
 
   @ViewChild(UnifiedDialogComponent)
   private unifiedDialogComponent?: UnifiedDialogComponent;

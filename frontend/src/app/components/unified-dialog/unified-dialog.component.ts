@@ -11,7 +11,7 @@ import { Component, ElementRef, input, output, ViewChild } from '@angular/core';
         </div>
         @if (addOkButtonForClosing()) {
         <div class="dialog-actions">
-          <button class="nes-btn" type="submit">Ok</button>
+          <button class="nes-btn" type="submit" (click)="resetActiveDialogType.emit()">Ok</button>
         </div>
         }
       </form>
@@ -21,6 +21,7 @@ import { Component, ElementRef, input, output, ViewChild } from '@angular/core';
 })
 export class UnifiedDialogComponent {
   readonly addOkButtonForClosing = input<boolean>(false);
+  readonly resetActiveDialogType = output();
 
   readonly overwriteGame = output<void>();
   readonly loadGame = output<void>();

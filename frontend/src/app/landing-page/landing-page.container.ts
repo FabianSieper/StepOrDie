@@ -15,6 +15,7 @@ import { LandingPageComponent } from './landing-page.component';
       (submitQuest)="handleEnterClick()"
       (loadGame)="loadExistingGame()"
       (overwriteGame)="requestLoadingInitialPlayingBoard(true)"
+      (resetActiveDialogType)="this.displayDialogType.set(undefined)"
     />
   `,
 })
@@ -68,20 +69,21 @@ export class LandingPageContainer {
   protected async requestLoadingInitialPlayingBoard(overwrite = false) {
     try {
       this.displayDialogType.set(DialogType.LOADING);
-
+      // TODO: remove
+      console.log('LOAAADING');
       this.logger.info('Sending request to load initial playing board...');
       const response = await this.backendService.loadGameStateFromNotion(
         this.notionUrl(),
         overwrite
       );
-
       this.logger.info('Successfully loaded initial playing board. Received Response: ', response);
       this.displayDialogType.set(DialogType.SUCCESS);
 
+      // Open game pager after
       setTimeout(() => {
         this.displayDialogType.set(undefined);
         this.router.navigate(['/game', response.pageId]);
-      });
+      }, 2500);
     } catch (error) {
       this.handleError(error as Error);
     }
