@@ -1,7 +1,12 @@
 
-form {
-    min-width: 80vw;
+:host dialog {
+    width: 80vw;
     max-width: 80vw;
+    overflow: hidden;
+}
+
+form {
+    width: 100%;
     min-height: 20vh;
     display: flex;
     flex-direction: column;
@@ -9,10 +14,8 @@ form {
 }
 
 .dialog-content {
-    flex: 1;
     display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    flex-direction: column;
     text-align: left;
 }
 

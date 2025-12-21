@@ -69,8 +69,6 @@ export class LandingPageContainer {
   protected async requestLoadingInitialPlayingBoard(overwrite = false) {
     try {
       this.displayDialogType.set(DialogType.LOADING);
-      // TODO: remove
-      console.log('LOAAADING');
       this.logger.info('Sending request to load initial playing board...');
       const response = await this.backendService.loadGameStateFromNotion(
         this.notionUrl(),

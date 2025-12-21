@@ -1,4 +1,4 @@
-import { Component, effect, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { InfoDialogComponent } from '../components/info-dialog/info-dialog.component';
 import { DialogType } from '../model/dialog-type.model';
 import { GameContainer } from './components/game/game.container';
@@ -24,6 +24,4 @@ import { GameContainer } from './components/game/game.container';
 export class GamePageComponent {
   readonly displayDialogType = input.required<DialogType | undefined>();
   readonly resetActiveDialogType = output();
-
-  private removeMe = effect(() => console.log(`Current dialog type: ${this.displayDialogType()}`));
 }

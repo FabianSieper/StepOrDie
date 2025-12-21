@@ -17,7 +17,7 @@ async function extractTiles(gameState: GameState): Promise<(GameElement | undefi
 async function mapToTiles(gameState: GameState): Promise<(GameElement | undefined)[][]> {
   const floorVisuals = await mapFloorVisuals();
   const mountainsVisuals = await mapMountainsVisuals();
-  const castleVisuals = await mapDoorVisuals();
+  const castleVisuals = await mapCastleVisuals();
 
   const tiles = Array.from({ length: gameState.grid.length }, () =>
     Array(gameState.grid[0].length).fill(undefined)
@@ -59,8 +59,8 @@ function createTileGameElement(visuals: Visuals, x: number, y: number): GameElem
   };
 }
 
-async function mapDoorVisuals(): Promise<Visuals> {
-  const floorImage = await loadAssetAsImage('assets/sprites/door.png');
+async function mapCastleVisuals(): Promise<Visuals> {
+  const floorImage = await loadAssetAsImage('assets/sprites/castle.png');
   return createSpriteDetails(
     floorImage,
     1, // cols

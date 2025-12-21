@@ -9,7 +9,7 @@ import { UnifiedDialogComponent } from '../../../components/unified-dialog/unifi
     <app-unified-dialog-component>
       <div>
         <p class="title">Attention!</p>
-        <p>The to be loaded game was already loaded in the past</p>
+        <p>The to be loaded game was already loaded in the past.</p>
         <p>Do you want do you want to do?</p>
         <menu class="dialog-menu">
           <button class="nes-btn" (click)="resetActiveDialogType.emit()">Cancel</button>
