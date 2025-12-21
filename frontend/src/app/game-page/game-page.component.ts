@@ -16,10 +16,13 @@ import { GameContainer } from './components/game/game.container';
     />
 
     <!-- Display playing field as soon as no dialog status is set, like loading or errors -->
+    @if (!displayDialogType()) {
     <div class="playing-board">
+      <h1 class="is-dark">You can do it!</h1>
       <app-game-container />
       <button (click)="backClicked.emit()" class="nes-btn">Take me back</button>
     </div>
+    }
   `,
 })
 export class GamePageComponent {
