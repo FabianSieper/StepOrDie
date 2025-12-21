@@ -12,11 +12,15 @@ import { GameService } from './services/game.service';
 @Component({
   selector: 'app-game-page-container',
   imports: [GamePageComponent],
-  template: ` <app-game-page-component
-    [displayDialogType]="displayDialogType()"
-    (resetActiveDialogType)="this.displayDialogType.set(undefined)"
-    (backClicked)="router.navigate(['/'])"
-  />`,
+  template: `
+    <app-game-page-component
+      [displayDialogType]="displayDialogType()"
+      (resetActiveDialogType)="this.displayDialogType.set(undefined)"
+      (backClicked)="displayDialogType.set(DialogType.ARE_YOU_SURE)"
+      (noClicked)="displayDialogType.set(undefined)"
+      (yesClicked)="router.navigate(['/'])"
+    />
+  `,
 })
 export class GamePageContainer {
   readonly router = inject(Router);
@@ -76,4 +80,5 @@ export class GamePageContainer {
       this.displayDialogType.set(DialogType.BACKEND_ERROR);
     }
   }
+  protected DialogType = DialogType;
 }

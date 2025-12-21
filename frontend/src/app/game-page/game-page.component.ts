@@ -11,19 +11,21 @@ import { GameContainer } from './components/game/game.container';
     <app-info-dialog-component
       [displayDialogType]="displayDialogType()"
       (resetActiveDialogType)="resetActiveDialogType.emit()"
+      (noClicked)="noClicked.emit()"
+      (yesClicked)="yesClicked.emit()"
     />
 
     <!-- Display playing field as soon as no dialog status is set, like loading or errors -->
-    @if (!displayDialogType()) {
     <div class="playing-board">
       <app-game-container />
       <button (click)="backClicked.emit()" class="nes-btn">Take me back</button>
     </div>
-    }
   `,
 })
 export class GamePageComponent {
   readonly displayDialogType = input.required<DialogType | undefined>();
   readonly resetActiveDialogType = output();
   readonly backClicked = output();
+  readonly yesClicked = output();
+  readonly noClicked = output();
 }

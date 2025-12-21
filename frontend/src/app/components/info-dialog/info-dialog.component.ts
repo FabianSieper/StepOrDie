@@ -1,12 +1,13 @@
 import { Component, effect, input, OnInit, output, viewChild } from '@angular/core';
-import { DialogType } from '../../model/dialog-type.model';
 import { DuplicateDialogComponent } from '../../landing-page/components/duplicate-dialog/duplicate-dialog.component';
+import { DialogType } from '../../model/dialog-type.model';
 import { MessageDialogInformation } from '../../model/message-dialog-information.model';
+import { AreYouSureDialogComponent } from '../are-you-sure-dialog/are-you-sure-dialog.component';
 import { MessageDialogComponent } from '../message-dialog/message-dialog.component';
 
 @Component({
   selector: 'app-info-dialog-component',
-  imports: [MessageDialogComponent, DuplicateDialogComponent],
+  imports: [MessageDialogComponent, AreYouSureDialogComponent, DuplicateDialogComponent],
   template: `
     <app-duplicate-dialog-component
       #duplicateDialog
@@ -21,6 +22,10 @@ import { MessageDialogComponent } from '../message-dialog/message-dialog.compone
       [switchParagraphsAfterMs]="switchParagraphsAfterMs()"
       (resetActiveDialogType)="resetActiveDialogType.emit()"
     />
+    <app-are-you-sure-dialog-component
+      (yesClicked)="yesClicked.emit()"
+      (noClicked)="noClicked.emit()"
+    />
   `,
 })
 export class InfoDialogComponent implements OnInit {
@@ -29,10 +34,12 @@ export class InfoDialogComponent implements OnInit {
   readonly loadGame = output();
   readonly overwriteGame = output();
   readonly resetActiveDialogType = output();
+  readonly yesClicked = output();
+  readonly noClicked = output();
 
   private readonly messageDialogComponent = viewChild(MessageDialogComponent);
-
   private readonly duplicateDialogComponent = viewChild(DuplicateDialogComponent);
+  private readonly areYouSureDialogComponent = viewChild(AreYouSureDialogComponent);
 
   private dialogMessageBasedOnType = new Map<DialogType, MessageDialogInformation | undefined>([
     [
@@ -85,17 +92,22 @@ export class InfoDialogComponent implements OnInit {
         addOkButtonForClosing: true,
       },
     ],
-    [DialogType.DUPLICATE_FOUND, undefined], // Is handled via duplicate-dialog.component.ts
+    [DialogType.ARE_YOU_SURE, undefined], // Is handled via are-you-sure-dialog.component.ts
+    [DialogType.DUPLICATE_FOUND, undefined], // Is handled via are-you-sure-dialog.component.ts
   ]);
 
   displayWarning = effect(() => {
     if (!this.displayDialogType()) {
       this.messageDialogComponent()?.dialog?.close();
+      this.duplicateDialogComponent()?.dialog?.close();
+      this.areYouSureDialogComponent()?.dialog?.close();
       return;
     }
 
     if (this.displayDialogType() == DialogType.DUPLICATE_FOUND) {
       this.duplicateDialogComponent()?.dialog?.showModal();
+    } else if (this.displayDialogType() == DialogType.ARE_YOU_SURE) {
+      this.areYouSureDialogComponent()?.dialog?.showModal();
     } else {
       this.messageDialogComponent()?.dialog?.showModal();
     }
