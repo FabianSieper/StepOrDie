@@ -12,15 +12,20 @@ export class GameService {
   readonly game = computed(() => this._game());
   readonly isGameDefined = computed(() => !!this._game());
 
+  private lastTimeGameDrawed = 0;
+  private gameDrawInterval = 1000 / 3; // Draw game at 3 FPS
+
+  private lastTimeUserInputProcessed = 0;
+  private userInputInterval = 1000 / 60; // Process user input at 60 FPS
+
   async setGameState(gameState: GameState) {
     this._game.set(await mapToGame(gameState));
   }
 
   async computationStep(ctx: CanvasRenderingContext2D | undefined) {
     if (!ctx) return;
-    this.clearDrawingBoard(ctx);
     this.drawGame(ctx);
-    this.animateGame();
+    this.triggerOnUserInput();
   }
 
   private animateGame() {
@@ -47,11 +52,41 @@ export class GameService {
       gameElement.visuals.spriteDetails.amountCols;
   }
 
+  private triggerOnUserInput() {
+    if (!this.shouldUpdateUserInput(Date.now())) return;
+
+    // TODO:
+  }
+
+  private shouldUpdateUserInput(timestamp: number): boolean {
+    const shouldUpdate = timestamp - this.lastTimeUserInputProcessed >= this.userInputInterval;
+    if (shouldUpdate) {
+      this.lastTimeUserInputProcessed = timestamp;
+      return true;
+    }
+    return false;
+  }
+
   private drawGame(ctx: CanvasRenderingContext2D) {
+    if (!this.shouldUpdateDrawing(Date.now())) return;
+
+    this.clearDrawingBoard(ctx);
     this.drawTiles(ctx, this._game()?.tiles, this._game()?.playingBoard);
     this.drawEnemies(ctx, this._game()?.enemies, this._game()?.playingBoard);
     // Draw player
     this.drawGameElement(ctx, this._game()?.player, this._game()?.playingBoard);
+
+    // Update sprites if required for the next drawing time
+    this.animateGame();
+  }
+
+  private shouldUpdateDrawing(timestamp: number): boolean {
+    const shouldUpdate = timestamp - this.lastTimeGameDrawed >= this.gameDrawInterval;
+    if (shouldUpdate) {
+      this.lastTimeGameDrawed = timestamp;
+      return true;
+    }
+    return false;
   }
 
   private drawTiles(

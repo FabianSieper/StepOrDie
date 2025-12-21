@@ -4,7 +4,6 @@ import { Component, ElementRef, input, viewChild } from '@angular/core';
   selector: 'app-game-component',
   imports: [],
   template: ` <canvas #playfield [width]="canvasWidth()" [height]="canvasHeight()"></canvas> `,
-  styleUrl: './game.component.scss',
 })
 export class GameComponent {
   readonly canvasWidth = input(640);

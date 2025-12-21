@@ -25,9 +25,6 @@ export class GameContainer implements OnDestroy, AfterViewInit {
   // The interval after which new frames are rendered im ms
   private readonly frameInterval = 1000 / 3;
 
-  // Timestamp at which the last drawing was done
-  private lastDraw = 0;
-
   // The request Animation Frame Id to stop animating
   private rafId: number | undefined = undefined;
 
@@ -56,10 +53,7 @@ export class GameContainer implements OnDestroy, AfterViewInit {
 
   startAnimationLoop() {
     const loop = (timestamp: number) => {
-      if (timestamp - this.lastDraw >= this.frameInterval) {
-        this.lastDraw = timestamp;
-        this.gameService.computationStep(this.ctx());
-      }
+      this.gameService.computationStep(this.ctx());
       this.rafId = requestAnimationFrame(loop);
     };
 
