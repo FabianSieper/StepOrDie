@@ -17,6 +17,7 @@ import { GameContainer } from './components/game/game.container';
     @if (!displayDialogType()) {
     <div class="playing-board">
       <app-game-container />
+      <button (click)="backClicked.emit()" class="nes-btn">Take me back</button>
     </div>
     }
   `,
@@ -24,4 +25,5 @@ import { GameContainer } from './components/game/game.container';
 export class GamePageComponent {
   readonly displayDialogType = input.required<DialogType | undefined>();
   readonly resetActiveDialogType = output();
+  readonly backClicked = output(); // TODO: utilize within the game-page.container.ts
 }
