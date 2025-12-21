@@ -96,17 +96,21 @@ export class GameService {
     }
 
     const source = this.calculateSpriteSection(visuals);
-    const target = this.calculateBoardTarget(gameElement, playingBoard);
+    const target = this.calculateBoardTarget(ctx, gameElement, playingBoard);
 
     this.drawSprite(ctx, visuals.spriteDetails.image, source, target);
   }
 
-  private calculateBoardTarget(gameElement: GameElement, playingBoard: PlayingBoard): Rect {
+  private calculateBoardTarget(
+    ctx: CanvasRenderingContext2D,
+    gameElement: GameElement,
+    playingBoard: PlayingBoard
+  ): Rect {
     return {
-      x: gameElement.position.x * playingBoard.tileWidth,
-      y: gameElement.position.y * playingBoard.tileHeight,
-      w: playingBoard.tileWidth,
-      h: playingBoard.tileHeight,
+      x: (gameElement.position.x * ctx.canvas.width) / playingBoard.amountFieldsX,
+      y: (gameElement.position.y * ctx.canvas.height) / playingBoard.amountFieldsY,
+      w: ctx.canvas.width / playingBoard.amountFieldsX,
+      h: ctx.canvas.height / playingBoard.amountFieldsY,
     };
   }
 

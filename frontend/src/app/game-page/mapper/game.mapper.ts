@@ -1,9 +1,6 @@
 import { Enemy, GameState, TileType } from '../../model/load-game-state-response.model';
 import { Game, GameElement, PlayingBoard, Visuals } from '../model/game.model';
 
-var playingBoardPixelsX = 1000;
-var playingBoardPixelsY = 1000;
-
 export async function mapToGame(gameState: GameState): Promise<Game> {
   return {
     player: await extractPlayer(gameState),
@@ -65,12 +62,8 @@ async function mapFloorVisuals(gameState: GameState): Promise<Visuals> {
 
 function extractPlayingBoard(gameState: GameState): PlayingBoard {
   return {
-    width: playingBoardPixelsX,
-    height: playingBoardPixelsY,
     amountFieldsX: gameState.width,
     amountFieldsY: gameState.height,
-    tileWidth: playingBoardPixelsX / gameState.width,
-    tileHeight: playingBoardPixelsY / gameState.height,
   };
 }
 

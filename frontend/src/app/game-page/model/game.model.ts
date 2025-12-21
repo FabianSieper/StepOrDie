@@ -36,12 +36,8 @@ export interface Rect {
 }
 
 export interface PlayingBoard {
-  width: number;
-  height: number;
   amountFieldsX: number;
   amountFieldsY: number;
-  tileWidth: number;
-  tileHeight: number;
 }
 
 export interface Position {
