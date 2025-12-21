@@ -25,5 +25,5 @@ import { GameContainer } from './components/game/game.container';
 export class GamePageComponent {
   readonly displayDialogType = input.required<DialogType | undefined>();
   readonly resetActiveDialogType = output();
-  readonly backClicked = output(); // TODO: utilize within the game-page.container.ts
+  readonly backClicked = output();
 }

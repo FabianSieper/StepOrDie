@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, effect, inject, Signal, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { map } from 'rxjs';
 import { DialogType } from '../model/dialog-type.model';
@@ -15,9 +15,11 @@ import { GameService } from './services/game.service';
   template: ` <app-game-page-component
     [displayDialogType]="displayDialogType()"
     (resetActiveDialogType)="this.displayDialogType.set(undefined)"
+    (backClicked)="router.navigate(['/'])"
   />`,
 })
 export class GamePageContainer {
+  readonly router = inject(Router);
   private readonly logger = inject(NGXLogger);
   private readonly route = inject(ActivatedRoute);
   private readonly backendService = inject(BackendService);
