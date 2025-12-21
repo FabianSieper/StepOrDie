@@ -2,7 +2,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { GameState } from '../../model/load-game-state-response.model';
 import { mapToGame } from '../mapper/game.mapper';
-import { Game, GameElement, PlayingBoard, Rect, SpriteDetails } from '../model/game.model';
+import { Game, GameElement, PlayingBoard, Rect, Visuals } from '../model/game.model';
 
 @Injectable({ providedIn: 'root' })
 export class GameService {
@@ -42,8 +42,9 @@ export class GameService {
 
   private animateGameElement(gameElement: GameElement) {
     // Move from left to right and back within a sprite row
-    gameElement.spriteDetails.nextAnimationCol =
-      (gameElement.spriteDetails.nextAnimationCol + 1) % gameElement.spriteDetails.amountCols;
+    gameElement.visuals.animationDetails.nextCol =
+      (gameElement.visuals.animationDetails.nextCol + 1) %
+      gameElement.visuals.spriteDetails.amountCols;
   }
 
   private drawGame(ctx: CanvasRenderingContext2D) {
@@ -66,9 +67,9 @@ export class GameService {
     gameElement?: GameElement,
     playingBoard?: PlayingBoard
   ) {
-    const spriteDetails = gameElement?.spriteDetails;
+    const visuals = gameElement?.visuals;
 
-    if (!spriteDetails) {
+    if (!visuals) {
       this.logger.warn('Not drawing sprite because details are undefined');
       return;
     }
@@ -78,10 +79,10 @@ export class GameService {
       return;
     }
 
-    const source = this.calculateSpriteSection(spriteDetails);
+    const source = this.calculateSpriteSection(visuals);
     const target = this.calculateBoardTarget(gameElement, playingBoard);
 
-    this.drawSprite(ctx, spriteDetails.image, source, target);
+    this.drawSprite(ctx, visuals.spriteDetails.image, source, target);
   }
 
   private calculateBoardTarget(gameElement: GameElement, playingBoard: PlayingBoard): Rect {
@@ -98,11 +99,16 @@ export class GameService {
   }
 
   // Returns x, y, width and height within a sprite which is to be rendered
-  private calculateSpriteSection(spriteDetail: SpriteDetails): Rect {
-    const x = spriteDetail.frameWidth * spriteDetail.nextAnimationCol;
-    const y = spriteDetail.frameHeight * spriteDetail.nextAnimationRow;
+  private calculateSpriteSection(spriteDetail: Visuals): Rect {
+    const x = spriteDetail.spriteDetails.frameWidth * spriteDetail.animationDetails.nextCol;
+    const y = spriteDetail.spriteDetails.frameHeight * spriteDetail.animationDetails.nextRow;
 
-    return { x, y, w: spriteDetail.frameWidth, h: spriteDetail.frameHeight };
+    return {
+      x,
+      y,
+      w: spriteDetail.spriteDetails.frameWidth,
+      h: spriteDetail.spriteDetails.frameHeight,
+    };
   }
 
   private drawSprite(

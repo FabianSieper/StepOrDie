@@ -9,14 +9,22 @@ export enum SpriteTypes {
 }
 
 // Convention: Animations always exist within a row
+export interface Visuals {
+  spriteDetails: SpriteDetails;
+  animationDetails: AnimationDetails;
+}
+
 export interface SpriteDetails {
   image: HTMLImageElement;
   frameWidth: number; // The width of one element within the sprite
   frameHeight: number; // The height of one element within the sprite
   amountCols: number;
   amountRows: number;
-  nextAnimationCol: number; // The next column to be animated
-  nextAnimationRow: number; // The next row to be animated
+}
+
+export interface AnimationDetails {
+  nextCol: number; // The next column to be animated
+  nextRow: number; // The next row to be animated
 }
 
 export interface Rect {
@@ -39,6 +47,6 @@ export interface Position {
 }
 
 export interface GameElement {
-  spriteDetails: SpriteDetails;
+  visuals: Visuals;
   position: Position;
 }

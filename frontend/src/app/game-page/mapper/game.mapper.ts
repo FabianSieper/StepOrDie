@@ -1,5 +1,5 @@
 import { Enemy, GameState } from '../../model/load-game-state-response.model';
-import { Game, GameElement, PlayingBoard, SpriteDetails } from '../model/game.model';
+import { Game, GameElement, PlayingBoard, Visuals } from '../model/game.model';
 
 var playingBoardPixelsX = 1000;
 var playingBoardPixelsY = 1000;
@@ -27,7 +27,7 @@ async function extractEnemies(gameState: GameState): Promise<GameElement[]> {
 }
 
 async function mapEnemy(enemy: Enemy, enemyImage: HTMLImageElement): Promise<GameElement> {
-  const spriteDetails: SpriteDetails = createSpriteDetails(
+  const spriteDetails: Visuals = createSpriteDetails(
     enemyImage,
     3, // cols
     5, // rows
@@ -36,7 +36,7 @@ async function mapEnemy(enemy: Enemy, enemyImage: HTMLImageElement): Promise<Gam
     4
   );
   return {
-    spriteDetails,
+    visuals: spriteDetails,
     position: { ...enemy.position },
   };
 }
@@ -52,7 +52,7 @@ async function extractPlayer(gameState: GameState): Promise<GameElement> {
     4
   );
   return {
-    spriteDetails,
+    visuals: spriteDetails,
     position: { x: gameState.player.position.x, y: gameState.player.position.y },
   };
 }
@@ -70,14 +70,18 @@ function createSpriteDetails(
   spriteRows: number,
   nextAnimationCol: number,
   nextAnimationRow: number
-): SpriteDetails {
+): Visuals {
   return {
-    image,
-    amountCols: spriteCols,
-    amountRows: spriteRows,
-    frameWidth: Math.floor(image.naturalWidth / spriteCols),
-    frameHeight: Math.floor(image.naturalHeight / spriteRows),
-    nextAnimationCol,
-    nextAnimationRow,
+    spriteDetails: {
+      image,
+      amountCols: spriteCols,
+      amountRows: spriteRows,
+      frameWidth: Math.floor(image.naturalWidth / spriteCols),
+      frameHeight: Math.floor(image.naturalHeight / spriteRows),
+    },
+    animationDetails: {
+      nextCol: nextAnimationCol,
+      nextRow: nextAnimationRow,
+    },
   };
 }
