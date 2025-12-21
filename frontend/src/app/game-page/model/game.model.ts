@@ -39,6 +39,8 @@ export interface PlayingBoard {
   height: number;
   amountFieldsX: number;
   amountFieldsY: number;
+  tileWidth: number;
+  tileHeight: number;
 }
 
 export interface Position {

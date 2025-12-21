@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
-import { DialogType } from '../game-page/game-page.component';
+import { DialogType } from '../model/dialog-type.model';
 import { BackendService } from '../services/backend.service';
 import { LandingPageComponent } from './landing-page.component';
 

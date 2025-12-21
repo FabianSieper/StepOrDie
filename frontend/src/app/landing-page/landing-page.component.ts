@@ -1,7 +1,7 @@
 import { Component, input, model, output, viewChild } from '@angular/core';
 import { InfoDialogComponent } from '../components/info-dialog/info-dialog.component';
 import { MessageDialogComponent } from '../components/message-dialog/message-dialog.component';
-import { DialogType } from '../game-page/game-page.component';
+import { DialogType } from '../model/dialog-type.model';
 
 @Component({
   selector: 'app-landing-page-component',

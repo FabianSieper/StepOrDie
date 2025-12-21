@@ -12,7 +12,7 @@ import (
 
 func GetPublicNotionPageContent(pageUrl string) (string, error) {
 
-	// 1. TODO: Verify that url is valid notion url
+	// 1. Verify that url is valid notion url
 	url, err := url.ParseRequestURI(pageUrl)
 	if err != nil {
 		return "", fmt.Errorf("invalid URL: %w", err)

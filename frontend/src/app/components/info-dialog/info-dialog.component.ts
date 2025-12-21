@@ -1,15 +1,8 @@
 import { Component, effect, input, OnInit, output, viewChild } from '@angular/core';
-import { DialogType } from '../../game-page/game-page.component';
+import { DialogType } from '../../model/dialog-type.model';
 import { DuplicateDialogComponent } from '../../landing-page/components/duplicate-dialog/duplicate-dialog.component';
+import { MessageDialogInformation } from '../../model/message-dialog-information.model';
 import { MessageDialogComponent } from '../message-dialog/message-dialog.component';
-
-// TODO: transfer to own model file
-interface MessageDialogInformation {
-  paragraphs?: string[];
-  switchParagraphsAfterMs?: number;
-  addOkButtonForClosing?: boolean;
-  header: string;
-}
 
 @Component({
   selector: 'app-info-dialog-component',
@@ -63,7 +56,6 @@ export class InfoDialogComponent implements OnInit {
         addOkButtonForClosing: true,
       },
     ],
-    // TODO: for loading, it should be possible to after some seconds dynamically switch the paragraphs
     [
       DialogType.LOADING,
       {
@@ -97,8 +89,6 @@ export class InfoDialogComponent implements OnInit {
   ]);
 
   displayWarning = effect(() => {
-    // TODO: remove
-    console.log(`Updated dialogType to ${this.displayDialogType()}`);
     if (!this.displayDialogType()) {
       this.messageDialogComponent()?.dialog?.close();
       return;

@@ -5,7 +5,8 @@ import { ActivatedRoute } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { map } from 'rxjs';
 import { BackendService } from '../services/backend.service';
-import { DialogType, GamePageComponent } from './game-page.component';
+import { DialogType } from '../model/dialog-type.model';
+import { GamePageComponent } from './game-page.component';
 import { GameService } from './services/game.service';
 
 @Component({
@@ -45,7 +46,6 @@ export class GamePageContainer {
       this.logger.info(`Successfully loaded game with ${gameId}`);
 
       // Only set to undefined if success, else error states are set via error handling
-      // TODO: uncomment
       this.displayDialogType.set(undefined);
     } catch (error) {
       if (error instanceof HttpErrorResponse) {

@@ -86,15 +86,11 @@ export class GameService {
   }
 
   private calculateBoardTarget(gameElement: GameElement, playingBoard: PlayingBoard): Rect {
-    // TODO: compute once and keep in playingBoard?
-    const tileWidth = playingBoard.width / playingBoard.amountFieldsX;
-    const tileHeight = playingBoard.height / playingBoard.amountFieldsY;
-
     return {
-      x: gameElement.position.x * tileWidth,
-      y: gameElement.position.y * tileHeight,
-      w: tileWidth,
-      h: tileHeight,
+      x: gameElement.position.x * playingBoard.tileWidth,
+      y: gameElement.position.y * playingBoard.tileHeight,
+      w: playingBoard.tileWidth,
+      h: playingBoard.tileHeight,
     };
   }
 

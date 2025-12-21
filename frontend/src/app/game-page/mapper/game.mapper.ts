@@ -18,6 +18,8 @@ function extractPlayingBoard(gameState: GameState): PlayingBoard {
     height: playingBoardPixelsY,
     amountFieldsX: gameState.width,
     amountFieldsY: gameState.height,
+    tileWidth: playingBoardPixelsX / gameState.width,
+    tileHeight: playingBoardPixelsY / gameState.height,
   };
 }
 
