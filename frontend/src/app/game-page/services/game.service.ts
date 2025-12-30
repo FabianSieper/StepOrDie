@@ -2,8 +2,10 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { GameState } from '../../model/load-game-state-response.model';
 import { Animator } from '../core-game/animator';
+import { Drawer } from '../core-game/drawer';
+import { UserInputHandler } from '../core-game/user-input-handler';
 import { mapToGame } from '../mapper/game.mapper';
-import { Game, GameElement, PlayingBoard, Rect, Visuals } from '../model/game.model';
+import { Game } from '../model/game.model';
 
 @Injectable({ providedIn: 'root' })
 export class GameService {
@@ -13,11 +15,8 @@ export class GameService {
   readonly game = computed(() => this._game());
   readonly isGameDefined = computed(() => !!this._game());
 
-  private lastTimeGameDrawed = 0;
-  private gameDrawInterval = 1000 / 3; // Draw game at 3 FPS
-
-  private lastTimeUserInputProcessed = 0;
-  private userInputInterval = 1000 / 60; // Process user input at 60 FPS
+  private userInputHandler = new UserInputHandler();
+  private drawer = new Drawer();
 
   async setGameState(gameState: GameState) {
     this._game.set(await mapToGame(gameState));
@@ -25,150 +24,19 @@ export class GameService {
 
   async computationStep(ctx: CanvasRenderingContext2D | undefined) {
     if (!ctx) return;
+    // TODO: add try catch here and log thrown error; continue afterwards
     this.drawGame(ctx);
-    this.triggerOnUserInput();
-  }
-
-  private triggerOnUserInput() {
-    if (!this.shouldUpdateUserInput(Date.now())) return;
-
-    // TODO:
-  }
-
-  private shouldUpdateUserInput(timestamp: number): boolean {
-    const shouldUpdate = timestamp - this.lastTimeUserInputProcessed >= this.userInputInterval;
-    if (shouldUpdate) {
-      this.lastTimeUserInputProcessed = timestamp;
-      return true;
-    }
-    return false;
-  }
-
-  private drawGame(ctx: CanvasRenderingContext2D) {
-    if (!this.shouldUpdateDrawing(Date.now())) return;
-
-    this.clearDrawingBoard(ctx);
-    this.drawTiles(ctx, this._game()?.tiles, this._game()?.playingBoard);
-    this.drawEnemies(ctx, this._game()?.enemies, this._game()?.playingBoard);
-    // Draw player
-    this.drawGameElement(ctx, this._game()?.player, this._game()?.playingBoard);
-
     // Update sprites if required for the next drawing time
     Animator.animateGame(this._game());
+
+    this.userInputHandler.triggerOnUserInput();
   }
 
-  private shouldUpdateDrawing(timestamp: number): boolean {
-    const shouldUpdate = timestamp - this.lastTimeGameDrawed >= this.gameDrawInterval;
-    if (shouldUpdate) {
-      this.lastTimeGameDrawed = timestamp;
-      return true;
+  private async drawGame(ctx: CanvasRenderingContext2D) {
+    try {
+      this.drawer.drawGame(ctx, this._game());
+    } catch (error) {
+      this.logger.error('Error while drawing game:', error);
     }
-    return false;
-  }
-
-  private drawTiles(
-    ctx: CanvasRenderingContext2D,
-    tiles?: (GameElement | undefined)[][],
-    playingBoard?: PlayingBoard
-  ) {
-    tiles?.forEach((tileCol) => this.drawTileCol(ctx, tileCol, playingBoard));
-  }
-
-  private drawTileCol(
-    ctx: CanvasRenderingContext2D,
-    tiles?: (GameElement | undefined)[],
-    playingBoard?: PlayingBoard
-  ) {
-    tiles?.filter(Boolean).forEach((tile) => this.drawGameElement(ctx, tile, playingBoard));
-  }
-
-  private drawEnemies(
-    ctx: CanvasRenderingContext2D,
-    enemies?: GameElement[],
-    playingBoard?: PlayingBoard
-  ) {
-    enemies?.forEach((enemy) => this.drawGameElement(ctx, enemy, playingBoard));
-  }
-
-  private drawGameElement(
-    ctx: CanvasRenderingContext2D,
-    gameElement?: GameElement,
-    playingBoard?: PlayingBoard
-  ) {
-    const visuals = gameElement?.visuals;
-
-    if (!visuals) {
-      this.logger.warn('Not drawing sprite because details are undefined');
-      return;
-    }
-
-    if (!playingBoard) {
-      this.logger.warn('Not drawing sprite because playing board is undefined');
-      return;
-    }
-
-    const source = this.calculateSpriteSection(visuals);
-    const target = this.calculateBoardTarget(ctx, gameElement, playingBoard);
-
-    this.drawSprite(ctx, visuals.spriteDetails.image, source, target);
-  }
-
-  private calculateBoardTarget(
-    ctx: CanvasRenderingContext2D,
-    gameElement: GameElement,
-    playingBoard: PlayingBoard
-  ): Rect {
-    return {
-      x: (gameElement.position.x * ctx.canvas.width) / playingBoard.amountFieldsX,
-      y: (gameElement.position.y * ctx.canvas.height) / playingBoard.amountFieldsY,
-      w: ctx.canvas.width / playingBoard.amountFieldsX,
-      h: ctx.canvas.height / playingBoard.amountFieldsY,
-    };
-  }
-
-  // Returns x, y, width and height within a sprite which is to be rendered
-  private calculateSpriteSection(spriteDetail: Visuals): Rect {
-    const x = spriteDetail.spriteDetails.frameWidth * spriteDetail.animationDetails.nextCol;
-    const y = spriteDetail.spriteDetails.frameHeight * spriteDetail.animationDetails.nextRow;
-
-    return {
-      x,
-      y,
-      w: spriteDetail.spriteDetails.frameWidth,
-      h: spriteDetail.spriteDetails.frameHeight,
-    };
-  }
-
-  private drawSprite(
-    ctx: CanvasRenderingContext2D,
-    image: HTMLImageElement,
-    source: Rect,
-    target: Rect
-  ) {
-    ctx.drawImage(
-      image,
-      source.x,
-      source.y,
-      source.w,
-      source.h,
-      target.x,
-      target.y,
-      target.w,
-      target.h
-    );
-  }
-
-  private clearDrawingBoard(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = '#333';
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  }
-
-  private verifyGameIsDefined() {
-    const game = this._game();
-
-    if (!game) {
-      throw new Error('Cannot animate player, as game is undefined');
-    }
-    return game;
   }
 }
