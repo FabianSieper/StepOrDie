@@ -1,6 +1,9 @@
 import { Injectable, WritableSignal } from '@angular/core';
 import { Game } from '../model/game.model';
 
+/**
+ * This service handles user keyboard input for controlling the game.
+ */
 @Injectable({ providedIn: 'root' })
 export class KeyInputService {
   private lastKeyPressed: string | undefined = undefined;

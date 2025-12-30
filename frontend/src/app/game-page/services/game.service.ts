@@ -7,6 +7,9 @@ import { mapToGame } from '../mapper/game.mapper';
 import { Game } from '../model/game.model';
 import { KeyInputService } from './key-input.service';
 
+/**
+ * This service manages the overall game state, including updating the game logic and rendering.
+ */
 @Injectable({ providedIn: 'root' })
 export class GameService {
   private readonly logger = inject(NGXLogger);
