@@ -7,7 +7,6 @@ export class Tile extends Entity {
   }
 
   public isWalkable(): boolean {
-    console.log(this.tileType);
     return this.tileType == TileType.FLOOR || this.tileType == TileType.GOAL;
   }
 }

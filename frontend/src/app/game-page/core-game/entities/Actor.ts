@@ -91,10 +91,19 @@ export abstract class Actor extends Entity {
   }
 
   private isPositionWalkable(game: Game, x: number, y: number): boolean {
-    return game.tiles[y][x].isWalkable() && !this.isEnemyAtPosition(game, x, y);
+    return (
+      game.tiles[y][x].isWalkable() &&
+      !this.isEnemyAtPosition(game, x, y) &&
+      !this.isPlayerAtPosition(game, x, y)
+    );
   }
 
   private isEnemyAtPosition(game: Game, x: number, y: number): boolean {
     return game.enemies.some((enemy) => enemy.getPosition().x === x && enemy.getPosition().y === y);
+  }
+
+  private isPlayerAtPosition(game: Game, x: number, y: number): boolean {
+    const playerPos = game.player.getPosition();
+    return playerPos.x === x && playerPos.y === y;
   }
 }
