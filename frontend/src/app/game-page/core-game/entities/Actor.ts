@@ -70,11 +70,25 @@ export abstract class Actor extends Entity {
     return false;
   }
 
-  protected abstract lookUp(): void;
-  protected abstract lookDown(): void;
-  protected abstract lookRight(): void;
-  protected abstract lookLeft(): void;
-  protected abstract setIdleAnimation(): void;
+  protected lookUp() {
+    this.gameElement.visuals.animationDetails.nextRow = 0;
+  }
+
+  protected lookDown() {
+    this.gameElement.visuals.animationDetails.nextRow = 1;
+  }
+
+  protected lookRight() {
+    this.gameElement.visuals.animationDetails.nextRow = 2;
+  }
+
+  protected lookLeft() {
+    this.gameElement.visuals.animationDetails.nextRow = 3;
+  }
+
+  protected setIdleAnimation() {
+    this.gameElement.visuals.animationDetails.nextCol = 4;
+  }
 
   private isPositionWalkable(game: Game, x: number, y: number): boolean {
     return game.tiles[y][x].isWalkable() && !this.isEnemyAtPosition(game, x, y);

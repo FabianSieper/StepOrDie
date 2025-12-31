@@ -20,10 +20,10 @@ export class KeyInputService {
    * Reacting on user input should be instant. This also includes moving the player character.
    */
   public reactOnUserInput(game: WritableSignal<Game | undefined>) {
+    // Keep in mind: Changes to objects within the signal which are not applied via .update or .set do not trigger the notify mechanism.
     const gameValue = game();
     if (!this.lastKeyPressed || !gameValue) return;
 
-    // TODO: user should not be able to move into walls
     switch (this.lastKeyPressed) {
       case 'ArrowUp':
         gameValue.player.moveUp(gameValue);
@@ -42,5 +42,13 @@ export class KeyInputService {
     }
 
     this.lastKeyPressed = undefined;
+    this.moveEnemies(gameValue);
+  }
+
+  private moveEnemies(game: Game) {
+    game.enemies.forEach((enemy) => {
+      // Simple AI: move randomly
+      enemy.moveRandomly(game);
+    });
   }
 }
