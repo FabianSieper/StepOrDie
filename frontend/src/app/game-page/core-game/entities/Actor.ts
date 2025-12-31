@@ -1,5 +1,7 @@
 import { Game, GameElement } from '../../model/game.model';
+import { Enemy } from './enemy';
 import { Entity } from './entity';
+import { Player } from './player';
 
 /**
  * An actor is a an entity which can perform actions in the game, like a player or a NPC.
@@ -93,17 +95,17 @@ export abstract class Actor extends Entity {
   private isPositionWalkable(game: Game, x: number, y: number): boolean {
     return (
       game.tiles[y][x].isWalkable() &&
-      !this.isEnemyAtPosition(game, x, y) &&
-      !this.isPlayerAtPosition(game, x, y)
+      !this.isEnemyAtPosition(game.enemies, x, y) &&
+      !this.isPlayerAtPosition(game.player, x, y)
     );
   }
 
-  private isEnemyAtPosition(game: Game, x: number, y: number): boolean {
-    return game.enemies.some((enemy) => enemy.getPosition().x === x && enemy.getPosition().y === y);
+  private isEnemyAtPosition(enemies: Enemy[], x: number, y: number): boolean {
+    return enemies.some((enemy) => enemy.getPosition().x === x && enemy.getPosition().y === y);
   }
 
-  private isPlayerAtPosition(game: Game, x: number, y: number): boolean {
-    const playerPos = game.player.getPosition();
+  private isPlayerAtPosition(player: Player, x: number, y: number): boolean {
+    const playerPos = player.getPosition();
     return playerPos.x === x && playerPos.y === y;
   }
 }

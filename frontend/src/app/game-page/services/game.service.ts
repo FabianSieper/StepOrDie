@@ -34,6 +34,11 @@ export class GameService {
 
     // Uses game state
     this.drawGame(ctx);
+
+    // TODO: validate game over conditions
+    if (this._game()?.player.isTouchingEnemy(this._game()?.enemies || [])) {
+      console.log('Game Over: Player touched an enemy!');
+    }
   }
 
   private async drawGame(ctx: CanvasRenderingContext2D) {
