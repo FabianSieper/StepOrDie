@@ -3,7 +3,7 @@ import { Entity } from './entities/entity';
 
 export class Drawer {
   private lastTimeGameDrawed = 0;
-  private gameDrawInterval = 1000 / 3; // Draw game at 3 FPS
+  private readonly gameDrawInterval = 1000 / 30; // Draw game at 3 FPS
 
   public drawGame(ctx: CanvasRenderingContext2D, game: Game | undefined) {
     if (!this.shouldUpdateDrawing(Date.now())) return;

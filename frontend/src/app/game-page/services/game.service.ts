@@ -26,7 +26,8 @@ export class GameService {
   }
 
   async computationStep(ctx: CanvasRenderingContext2D | undefined) {
-    if (!ctx) return;
+    if (!ctx || !this._game()) return;
+
     // Alters the game state
     Animator.animateGame(this._game);
     this.keyInputService.reactOnUserInput(this._game);
