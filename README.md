@@ -17,5 +17,3 @@ We rely on [Taskfile](https://taskfile.dev) for simple automation. After install
 - Store game state in a database
 - a search to search for already loaded games based on ids
 - fail if the pageid is already set so that the user can choose in the frontend if they want to overwrite or load the game state
-
-  
