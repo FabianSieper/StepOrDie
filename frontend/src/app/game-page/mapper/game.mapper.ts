@@ -31,15 +31,15 @@ async function mapToTiles(gameState: GameState): Promise<Tile[][]> {
     for (let col = 0; col < tiles[0].length; col++) {
       switch (gameState.grid[row][col]) {
         case TileType.FLOOR: {
-          tiles[row][col] = createTileGameElement(floorVisuals, col, row);
+          tiles[row][col] = createTileGameElement(TileType.FLOOR, floorVisuals, col, row);
           break;
         }
         case TileType.WALL: {
-          tiles[row][col] = createTileGameElement(mountainsVisuals, col, row);
+          tiles[row][col] = createTileGameElement(TileType.WALL, mountainsVisuals, col, row);
           break;
         }
         case TileType.GOAL: {
-          tiles[row][col] = createTileGameElement(castleVisuals, col, row);
+          tiles[row][col] = createTileGameElement(TileType.GOAL, castleVisuals, col, row);
           break;
         }
         case TileType.UNKNOWN: {
@@ -52,8 +52,8 @@ async function mapToTiles(gameState: GameState): Promise<Tile[][]> {
   return tiles;
 }
 
-function createTileGameElement(visuals: Visuals, x: number, y: number): Tile {
-  return new Tile({
+function createTileGameElement(tileType: TileType, visuals: Visuals, x: number, y: number): Tile {
+  return new Tile(tileType, {
     visuals,
     position: {
       x,

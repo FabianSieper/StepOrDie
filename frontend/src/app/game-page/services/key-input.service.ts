@@ -20,21 +20,22 @@ export class KeyInputService {
    * Reacting on user input should be instant. This also includes moving the player character.
    */
   public reactOnUserInput(game: WritableSignal<Game | undefined>) {
-    if (!this.lastKeyPressed || !game()) return;
+    const gameValue = game();
+    if (!this.lastKeyPressed || !gameValue) return;
 
     // TODO: user should not be able to move into walls
     switch (this.lastKeyPressed) {
       case 'ArrowUp':
-        game()?.player.moveUp();
+        gameValue.player.moveUp(gameValue);
         break;
       case 'ArrowDown':
-        game()?.player.moveDown();
+        gameValue.player.moveDown(gameValue);
         break;
       case 'ArrowLeft':
-        game()?.player.moveLeft();
+        gameValue.player.moveLeft(gameValue);
         break;
       case 'ArrowRight':
-        game()?.player.moveRight();
+        gameValue.player.moveRight(gameValue);
         break;
       default:
         break;

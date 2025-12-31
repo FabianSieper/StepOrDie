@@ -9,8 +9,11 @@ export interface Game {
   playingBoard: PlayingBoard;
 }
 
-export enum SpriteTypes {
-  PLAYER = 'PLAYER',
+export enum TileType {
+  WALL = 'WALL',
+  FLOOR = 'FLOOR',
+  GOAL = 'GOAL',
+  UNKNOWN = 'UNKNOWN',
 }
 
 // Convention: Animations always exist within a row

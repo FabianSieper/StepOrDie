@@ -1,4 +1,4 @@
-import { GameElement } from '../../model/game.model';
+import { Game, GameElement } from '../../model/game.model';
 import { Entity } from './entity';
 
 /**
@@ -9,23 +9,65 @@ export abstract class Actor extends Entity {
     super(gameElement);
   }
 
-  moveUp() {
+  // TODO: convert all to booleans whicih return true if move was possible
+  moveUp(game: Game): boolean {
+    // Should always still at least look at into the direction
     this.lookUp();
-    this.gameElement.position.y -= 1;
+
+    if (
+      this.gameElement.position.y > 0 &&
+      this.isPositionWalkable(game, this.gameElement.position.x, this.gameElement.position.y - 1)
+    ) {
+      this.gameElement.position.y -= 1;
+      return true;
+    }
+
+    return false;
   }
 
-  moveDown() {
+  moveDown(game: Game): boolean {
+    // Should always still at least look at into the direction
     this.lookDown();
-    this.gameElement.position.y += 1;
+
+    if (
+      this.gameElement.position.y < game.playingBoard.amountFieldsY + 1 &&
+      this.isPositionWalkable(game, this.gameElement.position.x, this.gameElement.position.y + 1)
+    ) {
+      this.gameElement.position.y += 1;
+      return true;
+    }
+
+    return false;
   }
 
-  moveLeft() {
+  moveLeft(game: Game): boolean {
+    // Should always still at least look at into the direction
     this.lookLeft();
-    this.gameElement.position.x -= 1;
+
+    if (
+      this.gameElement.position.x > 0 &&
+      this.isPositionWalkable(game, this.gameElement.position.x - 1, this.gameElement.position.y)
+    ) {
+      this.gameElement.position.x -= 1;
+      return true;
+    }
+
+    return false;
   }
-  moveRight() {
+
+  moveRight(game: Game): boolean {
+    // Should always still at least look at into the direction
     this.lookRight();
-    this.gameElement.position.x += 1;
+
+    if (
+      this.gameElement.position.x < game.playingBoard.amountFieldsX + 1 &&
+      this.isPositionWalkable(game, this.gameElement.position.x + 1, this.gameElement.position.y)
+    ) {
+      this.gameElement.position.x += 1;
+      return true;
+    }
+
+    return false;
   }
 
   protected abstract lookUp(): void;
@@ -33,4 +75,12 @@ export abstract class Actor extends Entity {
   protected abstract lookRight(): void;
   protected abstract lookLeft(): void;
   protected abstract setIdleAnimation(): void;
+
+  private isPositionWalkable(game: Game, x: number, y: number): boolean {
+    return game.tiles[y][x].isWalkable() && !this.isEnemyAtPosition(game, x, y);
+  }
+
+  private isEnemyAtPosition(game: Game, x: number, y: number): boolean {
+    return game.enemies.some((enemy) => enemy.getPosition().x === x && enemy.getPosition().y === y);
+  }
 }
