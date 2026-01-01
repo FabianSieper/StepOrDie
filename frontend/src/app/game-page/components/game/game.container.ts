@@ -30,10 +30,6 @@ export class GameContainer implements OnDestroy, AfterViewInit {
   // The request Animation Frame Id to stop animating
   private rafId: number | undefined = undefined;
 
-  // The amount of time the loosing or wining playfield should be displayed until the user is prompted to
-  // replay or go back to menu
-  private winOrLooseDelayMs = 2500;
-
   // The context for rendering on the canvas
   private readonly ctx: WritableSignal<CanvasRenderingContext2D | undefined> = signal(undefined);
 
@@ -54,33 +50,29 @@ export class GameContainer implements OnDestroy, AfterViewInit {
     if (GameStatus.LOST === status) {
       this.logger.info('Stopping animation loop because game was lost.');
 
-      setTimeout(() => {
-        // Stop animation/computation loop
-        cancelAnimationFrame(rafId);
+      // Stop animation/computation loop
+      cancelAnimationFrame(rafId);
 
-        this.rafId = undefined;
+      this.rafId = undefined;
 
-        // Reset game state and related variables
-        this.gameService.reset();
+      // Reset game state and related variables
+      this.gameService.reset();
 
-        // Trigger display of lost dialog
-        this.gameLost.emit();
-      }, this.winOrLooseDelayMs);
+      // Trigger display of lost dialog
+      this.gameLost.emit();
     } else if (GameStatus.WON === status) {
       this.logger.info('Stopping animation loop because game was won.');
 
-      setTimeout(() => {
-        // Stop animatino/computation loop
-        cancelAnimationFrame(rafId);
+      // Stop animatino/computation loop
+      cancelAnimationFrame(rafId);
 
-        this.rafId = undefined;
+      this.rafId = undefined;
 
-        // Reset game state and related variables
-        this.gameService.reset();
+      // Reset game state and related variables
+      this.gameService.reset();
 
-        // Trigger display of lost dialog
-        this.gameWon.emit();
-      }, this.winOrLooseDelayMs);
+      // Trigger display of lost dialog
+      this.gameWon.emit();
     }
   });
 

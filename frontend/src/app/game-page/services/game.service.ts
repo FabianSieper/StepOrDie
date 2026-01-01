@@ -1,9 +1,8 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { BackendService } from '../../services/backend.service';
 import { Animator } from '../core-game/animator';
 import { Drawer } from '../core-game/drawer';
-import { Entity } from '../core-game/entities/entity';
 import { mapToGame } from '../mapper/game.mapper';
 import { Game, GameStatus } from '../model/game.model';
 import { KeyInputService } from './key-input.service';
@@ -24,7 +23,13 @@ export class GameService {
   readonly status = computed(() => this._status());
   readonly isGameDefined = computed(() => !!this._game());
 
-  private drawer = new Drawer();
+  private readonly drawer = new Drawer();
+
+  // The delay until the user is prompted
+  private readonly loosingDelayMs = 3000;
+
+  // The delay until the dying animation of the user is displayed
+  private readonly dyingDelayMs = 1000;
 
   reset() {
     this._game.set(undefined);
@@ -51,6 +56,14 @@ export class GameService {
     this.checkOnGameStatus();
   }
 
+  private readonly transitionFromLoosingToLost = effect(() => {
+    if (this._status() === GameStatus.LOOSING) {
+      setTimeout(() => {
+        this._status.set(GameStatus.LOST);
+      }, this.loosingDelayMs);
+    }
+  });
+
   private reactOnUserInput() {
     // If the game is lost or won, no more user inputs should be registered
     if (this._status() == GameStatus.ONGOING) {
@@ -66,7 +79,13 @@ export class GameService {
       this._game()?.player.getEnemiesTouching(this._game()?.enemies ?? []) ?? [];
 
     if (enemiesTouched.length > 0) {
-      this._status.set(GameStatus.LOST);
+      // Player is currently loosing, which might include a loosing animation, but game is not finally lost
+      this._status.set(GameStatus.LOOSING);
+
+      setTimeout(() => {
+        this._game()?.player.die();
+      }, this.dyingDelayMs);
+
       // TODO: Let player do a dying animation
     } else if (this._game()?.player.isOnGoal(this._game())) {
       this._status.set(GameStatus.WON);

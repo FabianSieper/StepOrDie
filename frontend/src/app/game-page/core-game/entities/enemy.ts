@@ -1,12 +1,6 @@
 import { Game, GameElement } from '../../model/game.model';
-import { Actor } from './Actor';
-
-enum Direction {
-  UP = 'UP',
-  DOWN = 'DOWN',
-  LEFT = 'LEFT',
-  RIGHT = 'RIGHT',
-}
+import { Direction } from '../model/direction.model';
+import { Actor } from './actor';
 
 export class Enemy extends Actor {
   constructor(enemy: GameElement) {

@@ -1,5 +1,5 @@
 import { Game, GameElement } from '../../model/game.model';
-import { Actor } from './Actor';
+import { Actor } from './actor';
 import { Enemy } from './enemy';
 
 export class Player extends Actor {

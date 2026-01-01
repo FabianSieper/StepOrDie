@@ -58,7 +58,9 @@ export interface GameElement {
 }
 
 export enum GameStatus {
-  ONGOING = 'ONGOING',
-  WON = 'WON',
-  LOST = 'LOST',
+  ONGOING = 'ONGOING', // The user is able to navigate and the game is running
+  WON = 'WON', // The game is won; winning animations are completed
+  WINNING = 'WINNING', // A winning animation is displayed
+  LOST = 'LOST', // The game is lost; loosing animations are completed
+  LOOSING = 'LOOSING', // A loosing animation is displayed
 }

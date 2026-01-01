@@ -7,6 +7,8 @@ import { Player } from './player';
  * An actor is a an entity which can perform actions in the game, like a player or a NPC.
  */
 export abstract class Actor extends Entity {
+  private died = false;
+
   constructor(gameElement: GameElement) {
     super(gameElement);
   }
@@ -73,9 +75,37 @@ export abstract class Actor extends Entity {
   }
 
   die() {
+    this.died = true;
+    this.gameElement.visuals.animationDetails.nextCol = 0; // Dying should always start from col 0
     this.gameElement.visuals.animationDetails.nextRow = 4;
   }
 
+  cheer() {
+    // TODO: set corresponding sprite row + animate only once
+  }
+
+  override animate() {
+    if (this.died) {
+      this.animateOnce();
+    } else {
+      this.animateContinuously();
+    }
+  }
+
+  private animateOnce() {
+    if (
+      this.gameElement.visuals.animationDetails.nextCol + 1 <
+      this.gameElement.visuals.spriteDetails.amountCols
+    ) {
+      this.gameElement.visuals.animationDetails.nextCol += 1;
+    }
+  }
+
+  private animateContinuously() {
+    this.gameElement.visuals.animationDetails.nextCol += 1;
+    this.gameElement.visuals.animationDetails.nextCol %=
+      this.gameElement.visuals.spriteDetails.amountCols;
+  }
   protected lookUp() {
     this.gameElement.visuals.animationDetails.nextRow = 0;
   }
