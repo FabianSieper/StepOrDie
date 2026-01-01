@@ -60,6 +60,7 @@ export class GameService {
   private checkOnGameStatus() {
     if (this._game()?.player.isTouchingEnemy(this._game()?.enemies || [])) {
       this._status.set(GameStatus.LOST);
+      // TODO: increase contrast of all sprites
     } else if (this._game()?.player.isOnGoal(this._game())) {
       this._status.set(GameStatus.WON);
     }
@@ -67,6 +68,7 @@ export class GameService {
 
   private async drawGame(ctx: CanvasRenderingContext2D) {
     try {
+      // TODO: drawing should be in responsibilty of entity class
       this.drawer.drawGame(ctx, this._game());
     } catch (error) {
       this.logger.error('Error while drawing game:', error);

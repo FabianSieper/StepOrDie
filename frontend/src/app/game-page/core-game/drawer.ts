@@ -1,4 +1,4 @@
-import { Game, PlayingBoard, Position, Rect, Visuals } from '../model/game.model';
+import { Game, PlayingBoard } from '../model/game.model';
 import { Entity } from './entities/entity';
 
 export class Drawer {
@@ -7,14 +7,14 @@ export class Drawer {
 
   public drawGame(ctx: CanvasRenderingContext2D, game: Game | undefined) {
     if (!this.shouldUpdateDrawing(Date.now())) return;
-
     if (!game) return;
 
     this.clearDrawingBoard(ctx);
     this.drawTiles(ctx, game.tiles, game.playingBoard);
     this.drawEnemies(ctx, game.enemies, game.playingBoard);
+
     // Draw player
-    this.drawGameElement(ctx, game.player, game.playingBoard);
+    game.player.draw(ctx, game.playingBoard);
   }
 
   private shouldUpdateDrawing(timestamp: number): boolean {
@@ -31,7 +31,7 @@ export class Drawer {
   }
 
   private drawTileCol(ctx: CanvasRenderingContext2D, tiles: Entity[], playingBoard: PlayingBoard) {
-    tiles?.filter(Boolean).forEach((tile) => this.drawGameElement(ctx, tile, playingBoard));
+    tiles?.filter(Boolean).forEach((tile) => tile.draw(ctx, playingBoard));
   }
 
   private drawEnemies(
@@ -39,65 +39,7 @@ export class Drawer {
     enemies: Entity[],
     playingBoard: PlayingBoard
   ) {
-    enemies?.forEach((enemy) => this.drawGameElement(ctx, enemy, playingBoard));
-  }
-
-  private drawGameElement(
-    ctx: CanvasRenderingContext2D,
-    gameEntity: Entity,
-    playingBoard: PlayingBoard
-  ) {
-    const visuals = gameEntity.getVisuals();
-
-    const source = this.calculateSpriteSection(visuals);
-    const target = this.calculateBoardTarget(ctx, gameEntity.getPosition(), playingBoard);
-
-    this.drawSprite(ctx, visuals.spriteDetails.image, source, target);
-  }
-
-  private calculateBoardTarget(
-    ctx: CanvasRenderingContext2D,
-    elementPosition: Position,
-    playingBoard: PlayingBoard
-  ): Rect {
-    return {
-      x: (elementPosition.x * ctx.canvas.width) / playingBoard.amountFieldsX,
-      y: (elementPosition.y * ctx.canvas.height) / playingBoard.amountFieldsY,
-      w: ctx.canvas.width / playingBoard.amountFieldsX,
-      h: ctx.canvas.height / playingBoard.amountFieldsY,
-    };
-  }
-
-  // Returns x, y, width and height within a sprite which is to be rendered
-  private calculateSpriteSection(spriteDetail: Visuals): Rect {
-    const x = spriteDetail.spriteDetails.frameWidth * spriteDetail.animationDetails.nextCol;
-    const y = spriteDetail.spriteDetails.frameHeight * spriteDetail.animationDetails.nextRow;
-
-    return {
-      x,
-      y,
-      w: spriteDetail.spriteDetails.frameWidth,
-      h: spriteDetail.spriteDetails.frameHeight,
-    };
-  }
-
-  private drawSprite(
-    ctx: CanvasRenderingContext2D,
-    image: HTMLImageElement,
-    source: Rect,
-    target: Rect
-  ) {
-    ctx.drawImage(
-      image,
-      source.x,
-      source.y,
-      source.w,
-      source.h,
-      target.x,
-      target.y,
-      target.w,
-      target.h
-    );
+    enemies?.forEach((enemy) => enemy.draw(ctx, playingBoard));
   }
 
   private clearDrawingBoard(ctx: CanvasRenderingContext2D) {
