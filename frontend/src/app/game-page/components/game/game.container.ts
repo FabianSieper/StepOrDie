@@ -32,7 +32,7 @@ export class GameContainer implements OnDestroy, AfterViewInit {
 
   // The amount of time the loosing or wining playfield should be displayed until the user is prompted to
   // replay or go back to menu
-  private winOrLooseDelayMs = 2000;
+  private winOrLooseDelayMs = 2500;
 
   // The context for rendering on the canvas
   private readonly ctx: WritableSignal<CanvasRenderingContext2D | undefined> = signal(undefined);

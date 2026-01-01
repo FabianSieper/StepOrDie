@@ -3,6 +3,7 @@ import { NGXLogger } from 'ngx-logger';
 import { BackendService } from '../../services/backend.service';
 import { Animator } from '../core-game/animator';
 import { Drawer } from '../core-game/drawer';
+import { Entity } from '../core-game/entities/entity';
 import { mapToGame } from '../mapper/game.mapper';
 import { Game, GameStatus } from '../model/game.model';
 import { KeyInputService } from './key-input.service';
@@ -58,12 +59,24 @@ export class GameService {
   }
 
   private checkOnGameStatus() {
-    if (this._game()?.player.isTouchingEnemy(this._game()?.enemies || [])) {
+    // Only check game status if still on going
+    if (this._status() != GameStatus.ONGOING) return;
+
+    const enemiesTouched =
+      this._game()?.player.getEnemiesTouching(this._game()?.enemies ?? []) ?? [];
+
+    if (enemiesTouched.length > 0) {
       this._status.set(GameStatus.LOST);
       // TODO: increase contrast of all sprites
+      const touchingActors = [...enemiesTouched, this.game()?.player].filter((actor) => !!actor);
+      this.increaseContrast(touchingActors);
     } else if (this._game()?.player.isOnGoal(this._game())) {
       this._status.set(GameStatus.WON);
     }
+  }
+
+  private increaseContrast(entities: Entity[]) {
+    entities.forEach((entity) => entity.setIncreaseContrast(200));
   }
 
   private async drawGame(ctx: CanvasRenderingContext2D) {

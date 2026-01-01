@@ -7,15 +7,8 @@ export class Player extends Actor {
     super(player);
   }
 
-  isTouchingEnemy(enemies: Enemy[]): boolean {
-    return enemies
-      .map(
-        (enemy) =>
-          this.isTouchingDiagnally(enemy) ||
-          this.isTouchingHorizontally(enemy) ||
-          this.isTouchingVertically(enemy)
-      )
-      .some(Boolean);
+  getEnemiesTouching(enemies: Enemy[]): Enemy[] {
+    return enemies.filter((enemy) => this.isTouching(enemy));
   }
 
   isOnGoal(game: Game | undefined): boolean {
@@ -25,22 +18,15 @@ export class Player extends Actor {
     return tileBelowPlayer.isGoal();
   }
 
-  private isTouchingVertically(enemy: Actor): boolean {
-    if (this.gameElement.position.x !== enemy.getPosition().x) return false;
-    if (this.getPositionDiffY(enemy) === 1) return true;
-    return false;
-  }
-
-  private isTouchingHorizontally(enemy: Actor): boolean {
-    if (this.gameElement.position.y !== enemy.getPosition().y) return false;
-    if (this.getPositionDiffX(enemy) === 1) return true;
-    return false;
-  }
-
-  private isTouchingDiagnally(enemy: Actor): boolean {
+  private isTouching(enemy: Actor): boolean {
     const diffX = this.getPositionDiffX(enemy);
     const diffY = this.getPositionDiffY(enemy);
-    if (diffX === 1 && diffY === 1) return true;
+    if (
+      (diffX === 1 && diffY === 1) ||
+      (diffX === 1 && diffY === 0) ||
+      (diffX === 0 && diffY === 1)
+    )
+      return true;
     return false;
   }
 

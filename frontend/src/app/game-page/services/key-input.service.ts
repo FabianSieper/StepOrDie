@@ -41,14 +41,19 @@ export class KeyInputService {
         break;
     }
 
-    this.lastKeyPressed = undefined;
     this.moveEnemies(gameValue);
+    this.lastKeyPressed = undefined;
   }
 
   private moveEnemies(game: Game) {
-    game.enemies.forEach((enemy) => {
-      // Simple AI: move randomly
-      enemy.moveRandomly(game);
-    });
+    if (this.shallLastPressedKeyTriggerEnemyMovement())
+      game.enemies.forEach((enemy) => {
+        // Simple AI: move randomly
+        enemy.moveRandomly(game);
+      });
+  }
+
+  private shallLastPressedKeyTriggerEnemyMovement() {
+    return ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(this.lastKeyPressed ?? '');
   }
 }

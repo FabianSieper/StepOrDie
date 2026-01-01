@@ -1,6 +1,9 @@
-import { GameElement, PlayingBoard, Position, Rect, Visuals } from '../../model/game.model';
+import { GameElement, PlayingBoard, Rect } from '../../model/game.model';
 
 export class Entity {
+  // The filter applied to the ctx before rendering
+  private filter = '';
+
   constructor(protected gameElement: GameElement) {}
 
   getVisuals() {
@@ -20,6 +23,8 @@ export class Entity {
   draw(ctx: CanvasRenderingContext2D, playingBoard: PlayingBoard) {
     const target = this.calculateBoardTarget(ctx, playingBoard);
     const source = this.calculateSpriteSection();
+
+    ctx.filter = this.filter;
     ctx.drawImage(
       this.gameElement.visuals.spriteDetails.image,
       source.x,
@@ -31,6 +36,19 @@ export class Entity {
       target.w,
       target.h
     );
+    ctx.filter = 'none';
+  }
+
+  setIncreaseContrast(amount: number) {
+    this.filter = this.filter + ' contrast(' + amount + ')';
+  }
+
+  setGrayscale() {
+    this.filter = this.filter + ' grayscale(100%)';
+  }
+
+  resetFilter() {
+    this.filter = 'none';
   }
 
   private calculateBoardTarget(ctx: CanvasRenderingContext2D, playingBoard: PlayingBoard): Rect {
