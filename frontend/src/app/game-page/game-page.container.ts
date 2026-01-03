@@ -19,6 +19,8 @@ import { GameService } from './services/game.service';
       (noClicked)="displayDialogType.set(undefined)"
       (backToMenu)="router.navigate(['/'])"
       (reloadGame)="loadGame(gameId())"
+      (gameLost)="displayDialogType.set(DialogType.LOST)"
+      (gameWon)="displayDialogType.set(DialogType.WON)"
     />
   `,
 })

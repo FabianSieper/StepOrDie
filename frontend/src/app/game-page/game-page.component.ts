@@ -7,19 +7,15 @@ import { LostOrWonDialogComponent } from './components/lost-or-won-dialog/lost-o
 @Component({
   selector: 'app-game-page-component',
   styleUrl: 'game-page.component.scss',
-  imports: [GameContainer, InfoDialogComponent, LostOrWonDialogComponent],
+  imports: [GameContainer, InfoDialogComponent],
   template: `
     <app-info-dialog-component
       [displayDialogType]="displayDialogType()"
       (resetActiveDialogType)="resetActiveDialogType.emit()"
       (noClicked)="noClicked.emit()"
       (yesClicked)="backToMenu.emit()"
-    />
-
-    <app-lost-or-won-dialog-component
-      [gameWon]="gameWon()"
-      (restartClicked)="reloadGame.emit()"
-      (backToMenuClicked)="backToMenu.emit()"
+      (backToMenu)="backToMenu.emit()"
+      (reloadGame)="reloadGame.emit()"
     />
 
     <!-- Display playing field as soon as no dialog status is set, like loading or errors -->
@@ -28,8 +24,8 @@ import { LostOrWonDialogComponent } from './components/lost-or-won-dialog/lost-o
       <h1 class="is-dark">You can do it!</h1>
       <app-game-container
         (reloadGame)="reloadGame.emit()"
-        (gameLost)="displayLostOrWonDialog(false)"
-        (gameWon)="displayLostOrWonDialog(true)"
+        (gameLost)="gameLost.emit()"
+        (gameWon)="gameWon.emit()"
       />
       <button (click)="backClicked.emit()" class="nes-btn">Take me back</button>
     </div>
@@ -43,12 +39,6 @@ export class GamePageComponent {
   readonly noClicked = output();
   readonly reloadGame = output();
   readonly backToMenu = output();
-
-  protected readonly gameWon = signal(false);
-  private readonly lostOrWonDialogComponent = viewChild(LostOrWonDialogComponent);
-
-  protected displayLostOrWonDialog(won: boolean) {
-    this.gameWon.set(won);
-    this.lostOrWonDialogComponent()?.dialog?.showModal();
-  }
+  readonly gameWon = output();
+  readonly gameLost = output();
 }

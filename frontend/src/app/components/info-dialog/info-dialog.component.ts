@@ -1,4 +1,5 @@
 import { Component, effect, input, OnInit, output, viewChild } from '@angular/core';
+import { LostOrWonDialogComponent } from '../../game-page/components/lost-or-won-dialog/lost-or-won-dialog.component';
 import { DuplicateDialogComponent } from '../../landing-page/components/duplicate-dialog/duplicate-dialog.component';
 import { DialogType } from '../../model/dialog-type.model';
 import { MessageDialogInformation } from '../../model/message-dialog-information.model';
@@ -7,7 +8,12 @@ import { MessageDialogComponent } from '../message-dialog/message-dialog.compone
 
 @Component({
   selector: 'app-info-dialog-component',
-  imports: [MessageDialogComponent, AreYouSureDialogComponent, DuplicateDialogComponent],
+  imports: [
+    MessageDialogComponent,
+    AreYouSureDialogComponent,
+    DuplicateDialogComponent,
+    LostOrWonDialogComponent,
+  ],
   template: `
     <app-duplicate-dialog-component
       #duplicateDialog
@@ -26,6 +32,12 @@ import { MessageDialogComponent } from '../message-dialog/message-dialog.compone
       (yesClicked)="yesClicked.emit()"
       (noClicked)="noClicked.emit()"
     />
+
+    <app-lost-or-won-dialog-component
+      [gameWon]="displayDialogType() == DialogType.WON"
+      (restartClicked)="reloadGame.emit()"
+      (backToMenuClicked)="backToMenu.emit()"
+    />
   `,
 })
 export class InfoDialogComponent implements OnInit {
@@ -36,10 +48,13 @@ export class InfoDialogComponent implements OnInit {
   readonly resetActiveDialogType = output();
   readonly yesClicked = output();
   readonly noClicked = output();
+  readonly reloadGame = output();
+  readonly backToMenu = output();
 
   private readonly messageDialogComponent = viewChild(MessageDialogComponent);
   private readonly duplicateDialogComponent = viewChild(DuplicateDialogComponent);
   private readonly areYouSureDialogComponent = viewChild(AreYouSureDialogComponent);
+  private readonly lostOrWonDialogComponent = viewChild(LostOrWonDialogComponent);
 
   private dialogMessageBasedOnType = new Map<DialogType, MessageDialogInformation | undefined>([
     [
@@ -94,6 +109,8 @@ export class InfoDialogComponent implements OnInit {
     ],
     [DialogType.ARE_YOU_SURE, undefined], // Is handled via are-you-sure-dialog.component.ts
     [DialogType.DUPLICATE_FOUND, undefined], // Is handled via are-you-sure-dialog.component.ts
+    [DialogType.WON, undefined], // Is handled via app-lost-or-won-dialog-component.component.ts
+    [DialogType.LOST, undefined], // Is handled via app-lost-or-won-dialog-component.component.ts
   ]);
 
   displayWarning = effect(() => {
@@ -101,6 +118,7 @@ export class InfoDialogComponent implements OnInit {
       this.messageDialogComponent()?.dialog?.close();
       this.duplicateDialogComponent()?.dialog?.close();
       this.areYouSureDialogComponent()?.dialog?.close();
+      this.lostOrWonDialogComponent()?.dialog?.close();
       return;
     }
 
@@ -108,6 +126,11 @@ export class InfoDialogComponent implements OnInit {
       this.duplicateDialogComponent()?.dialog?.showModal();
     } else if (this.displayDialogType() == DialogType.ARE_YOU_SURE) {
       this.areYouSureDialogComponent()?.dialog?.showModal();
+    } else if (
+      this.displayDialogType() == DialogType.LOST ||
+      this.displayDialogType() == DialogType.WON
+    ) {
+      this.lostOrWonDialogComponent()?.dialog?.showModal();
     } else {
       this.messageDialogComponent()?.dialog?.showModal();
     }

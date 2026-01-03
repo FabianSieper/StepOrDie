@@ -1,5 +1,7 @@
 export enum DialogType {
   LOADING = 'LOADING',
+  WON = 'WON',
+  LOST = 'LOST',
   NOT_FOUND = 'NOT_FOUND',
   BACKEND_ERROR = 'BACKEND_ERROR',
   SUCCESS = 'SUCCESS',
