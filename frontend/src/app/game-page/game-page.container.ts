@@ -54,6 +54,7 @@ export class GamePageContainer {
       // Only set to undefined if success, else error states are set via error handling
       this.displayDialogType.set(undefined);
     } catch (error) {
+      // TODO: on http 404, no error is displayed
       if (error instanceof HttpErrorResponse) {
         this.handleHttpErrorResponse(error, gameId);
       } else {
