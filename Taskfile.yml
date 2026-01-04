@@ -34,10 +34,12 @@ tasks:
 
   build-backend:
     cmds: 
+      - docker image rm {{.BACKEND_IMAGE_TAG}} || true
       - docker build -t {{.BACKEND_IMAGE_TAG}} ./backend
 
   build-frontend:
     cmds:
+      - docker image rm {{.FRONTEND_IMAGE_TAG}} || true
       - docker build -t {{.FRONTEND_IMAGE_TAG}} ./frontend
 
   run-backend:  
@@ -51,7 +53,7 @@ tasks:
       - docker run -d -p {{.FRONTEND_PORT}}:{{.FRONTEND_PORT}} --name {{.FRONTEND_CONTAINER_NAME}} {{.FRONTEND_IMAGE_TAG}}
 
   run:
-    deps: [stop]
+    deps: [stop, build-backend, build-frontend]
     cmds:
       - docker-compose up -d
 
