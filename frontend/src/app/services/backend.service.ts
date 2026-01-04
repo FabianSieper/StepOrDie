@@ -7,8 +7,6 @@ import { GameState } from '../model/load-game-state-response.model';
 
 @Injectable({ providedIn: 'root' })
 export class BackendService {
-  private baseUrl: string = 'http://localhost:8080';
-
   private httpClient = inject(HttpClient);
 
   loadGameStateFromNotion(
@@ -33,10 +31,10 @@ export class BackendService {
   }
 
   getLoadGameStateFromCacheUrl() {
-    return `${this.baseUrl}/api/loadGameStateFromCache/`;
+    return `/api/loadGameStateFromCache/`;
   }
 
   getLoadGameStateFromNotionUrl() {
-    return `${this.baseUrl}/api/loadGameStateFromNotion`;
+    return `/api/loadGameStateFromNotion`;
   }
 }

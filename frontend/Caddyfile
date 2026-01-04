@@ -1,13 +1,13 @@
 :4200 {
-    # Rot directory where the compiled files live
-    root * /usr/share/caddy
+	encode zstd gzip
 
-    # Enable static file server
-    file_server
+	handle /api/* {
+		reverse_proxy {$BACKEND_UPSTREAM}
+	}
 
-    # SPA Routing: If a file isn't found, serve index.html
-    try_files {path} /index.html
-
-    # Optional: Enable Gzip/Zstd compression
-    encode zstd gzip
+	handle {
+		root * /usr/share/caddy
+		try_files {path} /index.html
+		file_server
+	}
 }

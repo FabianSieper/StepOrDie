@@ -47,6 +47,7 @@ export class GamePageContainer {
       return;
     }
 
+    // TODO: while loading, no loading circle or anything is displayed
     this.displayDialogType.set(DialogType.LOADING);
 
     try {

@@ -51,14 +51,13 @@ tasks:
       - docker run -d -p {{.FRONTEND_PORT}}:{{.FRONTEND_PORT}} --name {{.FRONTEND_CONTAINER_NAME}} {{.FRONTEND_IMAGE_TAG}}
 
   run:
+    deps: [stop]
     cmds:
-      - task: run-backend
-      - task: run-frontend
+      - docker-compose up -d
 
   stop:
     cmds:
-      - task: stop-backend
-      - task: stop-frontend
+      - docker-compose down
 
   test-load-game-state-from-notion:
     desc: "Send a sample request to /loadGameStateFromNotion (backend must be running)"
