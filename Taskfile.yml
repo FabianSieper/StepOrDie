@@ -6,7 +6,7 @@ env:
   FRONTEND_IMAGE_TAG: notionquestfrontend
   FRONTEND_CONTAINER_NAME: notionQuestFrontend
   FRONTEND_PORT: 4200
-  BACKEND_PORT: 8080
+  BACKEND_PORT: 8081
 
 tasks:
   default:
@@ -65,6 +65,6 @@ tasks:
     desc: "Send a sample request to /loadGameStateFromNotion (backend must be running)"
     cmds:
       - |
-        curl -vX POST http://localhost:8080/api/loadGameStateFromNotion \
+        curl -vX POST http://localhost:8081/api/loadGameStateFromNotion \
           -H 'Content-Type: application/json' \
           --data '{"notionUrl":"https://fabiansieper.notion.site/Notion-Quest-2c25e55239fb80f78f9df3fa2c2d65d1"}'

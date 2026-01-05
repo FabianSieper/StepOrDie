@@ -4,14 +4,14 @@ services:
     ports:
       - "4200:4200"
     environment:
-      - BACKEND_UPSTREAM=notion-quest-backend:8080
+      - BACKEND_UPSTREAM=notion-quest-backend:8081
     depends_on:
       - notion-quest-backend
 
   notion-quest-backend:
     build: ./backend
     ports:
-      - "8080:8080"
+      - "8081:8081"
 
   notion-quest-tunnel:
     image: cloudflare/cloudflared:latest

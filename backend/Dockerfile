@@ -30,7 +30,7 @@ COPY --from=builder /main /app/main
 ENV CHROMEDP_EXEC_PATH=/headless-shell/headless-shell
 
 # Expose the port app runs on
-EXPOSE 8080
+EXPOSE 8081
 
 # Run the binary
 ENTRYPOINT ["/app/main"]

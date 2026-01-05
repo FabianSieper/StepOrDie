@@ -15,6 +15,6 @@ COPY --from=builder /app/dist/NotionQuestFrontend/browser /usr/share/caddy
 COPY Caddyfile /etc/caddy/Caddyfile
 
 # Required so that the caddyfile can read the property and forward the requests to the backend
-ENV BACKEND_UPSTREAM=host.docker.internal:8080
+ENV BACKEND_UPSTREAM=host.docker.internal:8081
 
 EXPOSE 4200
