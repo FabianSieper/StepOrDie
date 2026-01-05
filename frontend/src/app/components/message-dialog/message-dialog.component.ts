@@ -8,7 +8,9 @@ import { UnifiedDialogComponent } from '../unified-dialog/unified-dialog.compone
   template: `
     <app-unified-dialog-component
       [addOkButtonForClosing]="addOkButtonForClosing()"
+      [addReturnToLandingPageButton]="addReturnToLandingPageButton()"
       (resetActiveDialogType)="resetActiveDialogType.emit()"
+      (returnToLandingPage)="returnToLandingPage.emit()"
     >
       <div class="text-div">
         @if (header()) {
@@ -29,8 +31,10 @@ export class MessageDialogComponent {
   readonly header = input.required<string | undefined>();
   readonly paragraphs = input.required<string[] | undefined>();
   readonly addOkButtonForClosing = input<boolean>(false);
+  readonly addReturnToLandingPageButton = input<boolean>(false);
   readonly switchParagraphsAfterMs = input<number>();
   readonly resetActiveDialogType = output();
+  readonly returnToLandingPage = output();
 
   private readonly dialogComponent = viewChild(UnifiedDialogComponent);
 

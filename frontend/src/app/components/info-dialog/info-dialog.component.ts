@@ -21,13 +21,17 @@ import { MessageDialogComponent } from '../message-dialog/message-dialog.compone
       (overwriteGame)="overwriteGame.emit()"
       (loadGame)="loadGame.emit()"
     />
+
     <app-message-dialog-component
       [header]="getTitleForDialogType()"
       [paragraphs]="getMessageForDialogType()"
       [addOkButtonForClosing]="shallDisplayOkButtonForClosing()"
+      [addReturnToLandingPageButton]="shallDisplayReturnToLandingPageButton()"
       [switchParagraphsAfterMs]="switchParagraphsAfterMs()"
       (resetActiveDialogType)="resetActiveDialogType.emit()"
+      (returnToLandingPage)="backToMenu.emit()"
     />
+
     <app-are-you-sure-dialog-component
       (yesClicked)="yesClicked.emit()"
       (noClicked)="noClicked.emit()"
@@ -42,7 +46,6 @@ import { MessageDialogComponent } from '../message-dialog/message-dialog.compone
 })
 export class InfoDialogComponent implements OnInit {
   readonly displayDialogType = input.required<DialogType | undefined>();
-  readonly addOkButtonForClosing = input<boolean>(false);
   readonly loadGame = output();
   readonly overwriteGame = output();
   readonly resetActiveDialogType = output();
@@ -65,6 +68,7 @@ export class InfoDialogComponent implements OnInit {
         ],
         header: 'Upsi Daisy',
         addOkButtonForClosing: false,
+        addReturnToLandingPageButton: true,
       },
     ],
     [
@@ -133,6 +137,12 @@ export class InfoDialogComponent implements OnInit {
     const type = this.displayDialogType();
     if (!type) return false;
     return this.dialogMessageBasedOnType.get(type)?.addOkButtonForClosing ?? false;
+  }
+
+  protected shallDisplayReturnToLandingPageButton() {
+    const type = this.displayDialogType();
+    if (!type) return false;
+    return this.dialogMessageBasedOnType.get(type)?.addReturnToLandingPageButton ?? false;
   }
 
   protected switchParagraphsAfterMs() {
