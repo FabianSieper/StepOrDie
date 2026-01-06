@@ -1,4 +1,4 @@
-import { Component, input, model, output, viewChild } from '@angular/core';
+import { Component, input, model, output, signal, viewChild } from '@angular/core';
 import { InfoDialogComponent } from '../components/info-dialog/info-dialog.component';
 import { MessageDialogComponent } from '../components/message-dialog/message-dialog.component';
 import { DialogType } from '../model/dialog-type.model';
@@ -18,15 +18,16 @@ import { DialogType } from '../model/dialog-type.model';
             id="quest-input"
             type="text"
             class="nes-input"
+            [class.input-error]="showInputError()"
             placeholder="Enter public Notion Page URL"
             [value]="notionUrl()"
             (input)="onNotionUrlInput($event)"
           />
-          <button type="button" (click)="submitQuest.emit()" class="nes-btn is-primary">Go!</button>
+          <button type="button" (click)="onSubmitClicked()" class="nes-btn is-primary">Go!</button>
         </div>
       </div>
     </section>
-    <!-- <button class="nes-btn feedback-button" (click)="openFeedbackPackge.emit()">Feedback</button> -->
+    <button class="nes-btn feedback-button" (click)="openFeedbackPackge.emit()">Feedback</button>
     }
     <app-info-dialog-component
       [displayDialogType]="displayDialogType()"
@@ -46,6 +47,7 @@ export class LandingPageComponent {
   readonly loadGame = output<void>();
   readonly resetActiveDialogType = output();
   readonly openFeedbackPackge = output();
+  protected readonly showInputError = signal(false);
 
   private readonly messageDialogRef = viewChild(MessageDialogComponent);
 
@@ -56,5 +58,18 @@ export class LandingPageComponent {
   protected onNotionUrlInput(event: Event): void {
     const value = (event.target as HTMLInputElement | null)?.value ?? '';
     this.notionUrl.set(value);
+    if (value.trim().length > 0 && this.showInputError()) {
+      this.showInputError.set(false);
+    }
+  }
+
+  protected onSubmitClicked(): void {
+    if (!this.notionUrl().trim()) {
+      this.showInputError.set(true);
+      return;
+    }
+
+    this.showInputError.set(false);
+    this.submitQuest.emit();
   }
 }

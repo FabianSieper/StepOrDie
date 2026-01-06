@@ -39,3 +39,8 @@ h1 {
 .feedback-button {
     transform: scale(0.8);          
 }
+
+.input-error {
+    border-color: #ff4d4f !important;
+    box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.3);
+}

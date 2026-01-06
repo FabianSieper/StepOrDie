@@ -16,10 +16,18 @@ section {
 }
 
 label {
-padding-left: 10px;
+    padding-left: 10px;
+}
+
+.input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-right: 5px;
 }
 
 .button-section {
+    margin-top: 10px;
     display: flex;
     justify-content:flex-end;
     gap: 10px;

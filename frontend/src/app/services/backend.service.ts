@@ -30,8 +30,18 @@ export class BackendService {
     );
   }
 
+  sendFeedback(name: string, feedback: string): Promise<void> {
+    return firstValueFrom(
+      this.httpClient.post<void>(this.getSendFeedbackUrl(), { name, feedback })
+    );
+  }
+
   getLoadGameStateFromCacheUrl() {
     return `/api/loadGameStateFromCache/`;
+  }
+
+  getSendFeedbackUrl() {
+    return `/api/sendFeedback`;
   }
 
   getLoadGameStateFromNotionUrl() {
