@@ -26,6 +26,7 @@ import { DialogType } from '../model/dialog-type.model';
         </div>
       </div>
     </section>
+    <button class="nes-btn feedback-button" (click)="openFeedbackPackge.emit()">Feedback</button>
     }
     <app-info-dialog-component
       [displayDialogType]="displayDialogType()"
@@ -44,6 +45,7 @@ export class LandingPageComponent {
   readonly overwriteGame = output<void>();
   readonly loadGame = output<void>();
   readonly resetActiveDialogType = output();
+  readonly openFeedbackPackge = output();
 
   private readonly messageDialogRef = viewChild(MessageDialogComponent);
 

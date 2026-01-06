@@ -1,0 +1,26 @@
+
+:host {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center; 
+    min-height: 100vh;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+label {
+padding-left: 10px;
+}
+
+.button-section {
+    display: flex;
+    justify-content:flex-end;
+    gap: 10px;
+}

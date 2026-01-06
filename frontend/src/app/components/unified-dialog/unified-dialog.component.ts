@@ -12,9 +12,11 @@ import { Component, ElementRef, input, output, viewChild } from '@angular/core';
         @if (addOkButtonForClosing() ||addReturnToLandingPageButton()) {
         <div class="dialog-actions">
           @if (addOkButtonForClosing()) {
-          <button class="nes-btn" type="submit" (click)="resetActiveDialogType.emit()">Ok</button>
+          <button class="nes-btn is-primary" type="submit" (click)="resetActiveDialogType.emit()">
+            Ok
+          </button>
           } @if (addReturnToLandingPageButton()) {
-          <button class="nes-btn" type="submit" (click)="returnToLandingPage.emit()">
+          <button class="nes-btn is-primary" type="submit" (click)="returnToLandingPage.emit()">
             Return to Landing page
           </button>
           }

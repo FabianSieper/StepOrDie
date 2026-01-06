@@ -16,15 +16,15 @@ import { LandingPageComponent } from './landing-page.component';
       (loadGame)="loadExistingGame()"
       (overwriteGame)="requestLoadingInitialPlayingBoard(true)"
       (resetActiveDialogType)="this.displayDialogType.set(undefined)"
+      (openFeedbackPackge)="router.navigate(['/feedback'])"
     />
   `,
 })
 export class LandingPageContainer {
   private logger = inject(NGXLogger);
   private backendService = inject(BackendService);
-  private router = inject(Router);
+  protected router = inject(Router);
 
-  // TODO: set to empty string by default
   protected readonly notionUrl = signal<string>(
     'https://fabiansieper.notion.site/Notion-Quest-2c25e55239fb80f78f9df3fa2c2d65d1?source=copy_link'
   );
