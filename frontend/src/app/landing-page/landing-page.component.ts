@@ -29,6 +29,7 @@ import { DialogType } from '../model/dialog-type.model';
     }
     <app-info-dialog-component
       [displayDialogType]="displayDialogType()"
+      loadingHeaderAppendix="from Notion"
       (resetActiveDialogType)="resetActiveDialogType.emit()"
       (loadGame)="loadGame.emit()"
       (overwriteGame)="overwriteGame.emit()"

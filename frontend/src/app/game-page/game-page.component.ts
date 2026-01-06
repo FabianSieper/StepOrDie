@@ -10,6 +10,7 @@ import { GameContainer } from './components/game/game.container';
   template: `
     <app-info-dialog-component
       [displayDialogType]="displayDialogType()"
+      loadingHeaderAppendix="Game State"
       (resetActiveDialogType)="resetActiveDialogType.emit()"
       (noClicked)="noClicked.emit()"
       (yesClicked)="backToMenu.emit()"

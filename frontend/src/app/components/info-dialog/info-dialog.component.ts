@@ -46,6 +46,7 @@ import { MessageDialogComponent } from '../message-dialog/message-dialog.compone
 })
 export class InfoDialogComponent implements OnInit {
   readonly displayDialogType = input.required<DialogType | undefined>();
+  readonly loadingHeaderAppendix = input<string>();
   readonly loadGame = output();
   readonly overwriteGame = output();
   readonly resetActiveDialogType = output();
@@ -124,7 +125,12 @@ export class InfoDialogComponent implements OnInit {
   protected getTitleForDialogType() {
     const type = this.displayDialogType();
     if (!type) return;
-    return this.dialogMessageBasedOnType.get(type)?.header;
+
+    if (this.displayDialogType() === DialogType.LOADING && this.loadingHeaderAppendix()) {
+      return this.dialogMessageBasedOnType.get(type)?.header + ' ' + this.loadingHeaderAppendix();
+    } else {
+      return this.dialogMessageBasedOnType.get(type)?.header;
+    }
   }
 
   protected getMessageForDialogType() {
