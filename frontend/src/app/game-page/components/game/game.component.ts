@@ -5,6 +5,7 @@ import { GameStatus } from '../../model/game.model';
   selector: 'app-game-component',
   imports: [],
   template: ` <canvas #playfield [width]="canvasWidth()" [height]="canvasHeight()"></canvas> `,
+  styleUrl: './game.component.scss',
 })
 export class GameComponent {
   readonly gameStatus = input.required<GameStatus>();
