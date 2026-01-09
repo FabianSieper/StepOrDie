@@ -29,6 +29,8 @@ export class FeedbackPageContainer {
   protected feedback = signal('');
   protected wasSubmitted = signal(false);
 
+  private readonly SUCCESS_DISPLAY_TIME = 1000;
+
   protected async sendFeedback() {
     this.wasSubmitted.set(true);
 
@@ -40,11 +42,17 @@ export class FeedbackPageContainer {
     try {
       await this.backenService.sendFeedback(this.name(), this.feedback());
 
-      // Reset everything
-      this.name.set('');
-      this.feedback.set('');
-      this.wasSubmitted.set(false);
-      this.displayDialogType.set(undefined);
+      // Display success dialog
+      this.displayDialogType.set(DialogType.SUCCESS);
+
+      // Reset everything after some time
+      setTimeout(() => {
+        this.name.set('');
+        this.feedback.set('');
+        this.wasSubmitted.set(false);
+        this.displayDialogType.set(undefined);
+        this.displayDialogType.set(undefined);
+      }, this.SUCCESS_DISPLAY_TIME);
     } catch (error) {
       this.logger.warn(`Failed to send feedback. Received error: ${error}`);
       this.displayDialogType.set(DialogType.BACKEND_ERROR);
