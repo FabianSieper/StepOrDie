@@ -5,23 +5,11 @@ import { MatIconModule } from '@angular/material/icon';
   selector: 'app-music-button-component',
   imports: [MatIconModule],
   template: `
-    <div>
-      <button
-        type="button"
-        class="nes-btn"
-        [class.is-disabled]="!isMusicPlaying()"
-        [disabled]="!isMusicPlaying()"
-        (click)="quieter.emit()"
-      >
+    <div class="button-row">
+      <button type="button" class="nes-btn" (click)="quieter.emit()">
         <mat-icon>remove</mat-icon>
       </button>
-      <button
-        type="button"
-        class="nes-btn"
-        [class.is-disabled]="!isMusicPlaying()"
-        [disabled]="!isMusicPlaying()"
-        (click)="louder.emit()"
-      >
+      <button type="button" class="nes-btn" (click)="louder.emit()">
         <mat-icon>add</mat-icon>
       </button>
       <button type="button" class="nes-btn" (click)="toggleMusic.emit()">
@@ -33,7 +21,8 @@ import { MatIconModule } from '@angular/material/icon';
       </button>
     </div>
     <div class="volume-display-area">
-      <span class="music-volume-readout">{{ volume() }}</span>
+      <span>{{ volume() }}</span>
+      <progress class="nes-progress is-dark is-primary" [value]="volume()" max="100"></progress>
     </div>
   `,
   styleUrl: './music-button.component.scss',

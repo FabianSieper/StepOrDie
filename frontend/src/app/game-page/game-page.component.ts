@@ -30,8 +30,8 @@ import { GameContainer } from './components/game/game.container';
       />
       <button (click)="backClicked.emit()" class="nes-btn take-me-back-button">Take me back</button>
     </div>
-    }
     <app-music-button-container class="small-button" />
+    }
   `,
 })
 export class GamePageComponent {
