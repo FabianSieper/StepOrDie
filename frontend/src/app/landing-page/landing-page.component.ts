@@ -30,12 +30,12 @@ import { DialogType } from '../model/dialog-type.model';
     </section>
     <div>
       <button class="nes-btn feedback-button" (click)="openFeedbackPackge.emit()">Feedback</button>
-      <app-music-button-container />
     </div>
 
     @if(version()) {
     <span class="nes-text is-disabled version-text">Version {{ version() }}</span>
     } }
+    <app-music-button-container />
 
     <app-info-dialog-component
       [displayDialogType]="displayDialogType()"

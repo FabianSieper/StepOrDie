@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { AudioService } from '../../services/audio.service';
+import { MusicService } from '../../services/music.service';
 import { MusicButtonComponent } from './music-button.component';
 
 @Component({
@@ -8,11 +8,14 @@ import { MusicButtonComponent } from './music-button.component';
   styleUrl: './music-button.container.scss',
   template: `
     <app-music-button-component
-      (toggleMusic)="audioService.toggleMusic()"
-      [isMusicPlaying]="audioService.isAudioPlaying()"
+      [isMusicPlaying]="musicService.isMusicPlaying()"
+      [volume]="musicService.getVolume()"
+      (toggleMusic)="musicService.toggleMusic()"
+      (louder)="musicService.louder()"
+      (quieter)="musicService.quieter()"
     />
   `,
 })
 export class MusicButtonContainer {
-  protected readonly audioService = inject(AudioService);
+  protected readonly musicService = inject(MusicService);
 }

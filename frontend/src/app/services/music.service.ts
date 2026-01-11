@@ -1,24 +1,45 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 
 @Injectable({ providedIn: 'root' })
-export class AudioService {
+export class MusicService {
   private readonly logger = inject(NGXLogger);
+
+  private readonly VOLUME_CHANGE_AMOUNT = 0.1;
+  private readonly DEFAULT_VOLUME = 0.5;
 
   private _isMusicPlaying = signal(false);
   private audio: HTMLAudioElement | undefined;
 
-  isAudioDefined() {
+  // Separate signal required to allow components to listen on changes
+  private readonly volume = signal(this.DEFAULT_VOLUME);
+
+  readonly getVolume = computed(() => Math.round(this.volume() * 100));
+
+  isMusicDefined() {
     return !!this.audio;
   }
 
-  isAudioPlaying() {
+  isMusicPlaying() {
     return this._isMusicPlaying();
   }
 
-  setAudioSrc(src: string, loop = false) {
+  setAudioSrc(src: string, loop = false, loudness = 0.5) {
     this.audio = new Audio(src);
     this.audio.loop = loop;
+    this.audio.volume = loudness;
+  }
+
+  louder() {
+    if (!this.audio) return;
+    this.audio.volume += this.VOLUME_CHANGE_AMOUNT;
+    this.volume.set(this.audio.volume);
+  }
+
+  quieter() {
+    if (!this.audio) return;
+    this.audio.volume -= this.VOLUME_CHANGE_AMOUNT;
+    this.volume.set(this.audio.volume);
   }
 
   async toggleMusic() {

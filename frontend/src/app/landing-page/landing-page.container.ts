@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { DialogType } from '../model/dialog-type.model';
-import { AudioService } from '../services/audio.service';
+import { MusicService } from '../services/music.service';
 import { BackendService } from '../services/backend.service';
 import { LandingPageComponent } from './landing-page.component';
 
@@ -26,7 +26,7 @@ export class LandingPageContainer implements OnInit {
   private logger = inject(NGXLogger);
   private backendService = inject(BackendService);
   protected router = inject(Router);
-  protected audioService = inject(AudioService);
+  protected musicService = inject(MusicService);
 
   protected readonly notionUrl = signal<string>(
     'https://fabiansieper.notion.site/Notion-Quest-2c25e55239fb80f78f9df3fa2c2d65d1?source=copy_link'
@@ -38,7 +38,7 @@ export class LandingPageContainer implements OnInit {
   private lastDuplicateNotionPageId: string | undefined = undefined;
 
   async ngOnInit(): Promise<void> {
-    this.initAudioService();
+    this.initMusicService();
     await this.loadVersion();
   }
 
@@ -105,12 +105,13 @@ export class LandingPageContainer implements OnInit {
     }
   }
 
-  private initAudioService() {
+  private initMusicService() {
     // Only set audio src if game initis the first time and not, for example,
     // when the player returns back to the main page. That transition is handled
     // differently to allow for transitions between music.
-    if (!this.audioService.isAudioDefined()) {
-      this.audioService.setAudioSrc('assets/audio/landing-page.mp3', true);
+    if (!this.musicService.isMusicDefined()) {
+      // Music from https://pixabay.com/music/video-games-i-love-my-8-bit-game-console-301272/
+      this.musicService.setAudioSrc('assets/audio/landing-page.mp3', true);
     }
   }
 

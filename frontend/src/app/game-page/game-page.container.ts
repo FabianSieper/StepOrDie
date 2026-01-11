@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { map } from 'rxjs';
 import { DialogType } from '../model/dialog-type.model';
-import { AudioService } from '../services/audio.service';
+import { MusicService } from '../services/music.service';
 import { GamePageComponent } from './game-page.component';
 import { GameService } from './services/game.service';
 
@@ -30,7 +30,7 @@ export class GamePageContainer implements OnInit {
   private readonly logger = inject(NGXLogger);
   private readonly route = inject(ActivatedRoute);
   private readonly gameService = inject(GameService);
-  private readonly audioService = inject(AudioService);
+  private readonly musicService = inject(MusicService);
 
   protected readonly displayDialogType = signal<DialogType | undefined>(undefined);
 
@@ -44,7 +44,7 @@ export class GamePageContainer implements OnInit {
   });
 
   ngOnInit(): void {
-    this.initAudioService();
+    this.initMusicService();
   }
 
   protected async loadGame(gameId: string | undefined) {
@@ -69,12 +69,12 @@ export class GamePageContainer implements OnInit {
     }
   }
 
-  private initAudioService() {
+  private initMusicService() {
     // Only set audio src if game initis the first time and not, for example,
     // when the player returns back to the main page. That transition is handled
     // differently to allow for transitions between music.
-    if (!this.audioService.isAudioDefined()) {
-      this.audioService.setAudioSrc('assets/audio/landing-page.mp3', true);
+    if (!this.musicService.isMusicDefined()) {
+      this.musicService.setAudioSrc('assets/audio/landing-page.mp3', true);
     }
   }
 

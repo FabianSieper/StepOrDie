@@ -17,10 +17,12 @@
 
 .take-me-back-button {
     transform: scale(0.9);
-    margin: 0px
+    margin-top: 10px;
 }
 
 app-music-button-container {
+    position: absolute;
+    top: 10px;
+    right: 0px;
     transform: scale(0.8);
-    margin: 0px;
 }
