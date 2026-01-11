@@ -34,8 +34,10 @@ import { DialogType } from '../model/dialog-type.model';
 
     @if(version()) {
     <span class="nes-text is-disabled version-text">Version {{ version() }}</span>
-    } }
+    }
+
     <app-music-button-container />
+    }
 
     <app-info-dialog-component
       [displayDialogType]="displayDialogType()"
