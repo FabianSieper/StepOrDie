@@ -22,7 +22,7 @@ import { MatIconModule } from '@angular/material/icon';
     </div>
     <div class="volume-display-column">
       <progress class="nes-progress is-dark is-primary" [value]="volume()" max="100"></progress>
-      <span>{{ volume() }}</span>
+      <span class="volume-text">{{ volume() }}</span>
     </div>
   `,
   styleUrl: './music-button.component.scss',

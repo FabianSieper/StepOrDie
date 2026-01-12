@@ -2,11 +2,12 @@ import { Component, input, model, output, signal, viewChild } from '@angular/cor
 import { InfoDialogComponent } from '../components/info-dialog/info-dialog.component';
 import { MessageDialogComponent } from '../components/message-dialog/message-dialog.component';
 import { MusicButtonContainer } from '../components/music-button/music-button.container';
+import { VersionContainer } from '../components/version/version.container';
 import { DialogType } from '../model/dialog-type.model';
 
 @Component({
   selector: 'app-landing-page-component',
-  imports: [InfoDialogComponent, MusicButtonContainer],
+  imports: [InfoDialogComponent, MusicButtonContainer, VersionContainer],
   template: `
     @if (!displayDialogType()) {
     <section class="nes-container is-rounded landing-shell is-dark">
@@ -32,8 +33,7 @@ import { DialogType } from '../model/dialog-type.model';
       <button class="nes-btn feedback-button" (click)="openFeedbackPackge.emit()">Feedback</button>
     </div>
 
-    <!-- TODO: add version component here -->
-
+    <app-version-container />
     <app-music-button-container />
     }
 

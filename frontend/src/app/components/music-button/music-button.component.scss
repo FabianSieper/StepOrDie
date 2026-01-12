@@ -1,6 +1,6 @@
 :host {
     position: absolute;
-    top: -30px;
+    top: -50px;
     right: 0px;
     transform: scale(0.6);
 }
@@ -21,4 +21,9 @@ progress {
     height: 100px;
     transform: rotate(180deg);
     writing-mode: vertical-lr;
+}
+
+.volume-text {
+    transform: translateY(-65px);
+    color: black;
 }

@@ -9,5 +9,5 @@ import { Component, input } from '@angular/core';
   styleUrl: './version.component.scss',
 })
 export class VersionComponent {
-  readonly version = input.required<string | boolean>();
+  readonly version = input.required<string | undefined>();
 }

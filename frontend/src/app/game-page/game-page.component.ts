@@ -3,11 +3,12 @@ import { InfoDialogComponent } from '../components/info-dialog/info-dialog.compo
 import { MusicButtonContainer } from '../components/music-button/music-button.container';
 import { DialogType } from '../model/dialog-type.model';
 import { GameContainer } from './components/game/game.container';
+import { VersionContainer } from '../components/version/version.container';
 
 @Component({
   selector: 'app-game-page-component',
   styleUrl: 'game-page.component.scss',
-  imports: [GameContainer, InfoDialogComponent, MusicButtonContainer],
+  imports: [GameContainer, InfoDialogComponent, MusicButtonContainer, VersionContainer],
   template: `
     <app-info-dialog-component
       [displayDialogType]="displayDialogType()"
@@ -31,6 +32,7 @@ import { GameContainer } from './components/game/game.container';
       <button (click)="backClicked.emit()" class="nes-btn take-me-back-button">Take me back</button>
     </div>
     <app-music-button-container />
+    <app-version-container />
     }
   `,
 })
