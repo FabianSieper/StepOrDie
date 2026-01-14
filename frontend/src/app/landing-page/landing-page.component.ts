@@ -13,7 +13,7 @@ import { DialogType } from '../model/dialog-type.model';
     <section class="nes-container is-rounded landing-shell is-dark">
       <h1>Step or Die!</h1>
       <label for="game-id-input" class="space-above">Game ID</label>
-      <input id="game-id-input" class="nes-input game-id-input" [(value)]="gameId" />
+      <input id="game-id-input" class="nes-input game-id-input" [(ngModel)]="gameId" />
       <label for="playing-field" class="space-above">Playing Field</label>
       <textarea
         id="playing-field"

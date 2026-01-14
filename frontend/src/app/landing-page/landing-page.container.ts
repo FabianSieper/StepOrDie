@@ -32,33 +32,15 @@ export class LandingPageContainer implements OnInit {
 
   private readonly DISPLAY_SUCCESS_TIME = 1500;
 
-  // Init game id with random string
-  protected readonly gameId = signal<string>(
-    Array.from({ length: 12 }, () => String.fromCharCode(97 + Math.floor(Math.random() * 26))).join(
-      ''
-    )
-  );
-
-  protected readonly gameField = signal<string>(`###############
-#S............#
-#...####...M..#
-#...#......##.#
-#...#..M......#
-#.............#
-#...####......#
-#...#..Z......#
-#...#.....M...#
-#.............#
-#.......####..#
-#....M..#..#..#
-#.......#..#..#
-#.......####..#
-###############`);
+  protected readonly gameId = signal<string>('');
+  protected readonly gameField = signal<string>('');
 
   protected readonly displayDialogType = signal<DialogType | undefined>(undefined);
   protected readonly version = signal<string | undefined>(undefined);
 
   async ngOnInit(): Promise<void> {
+    this.setInitGameField();
+    this.setRandomGameId();
     this.initMusicService();
   }
 
@@ -67,11 +49,11 @@ export class LandingPageContainer implements OnInit {
 
     try {
       await this.backendService.storeGameState(this.gameId(), this.gameField(), overwrite);
-
       this.displayDialogType.set(DialogType.SUCCESS);
 
+      // Open game page after some time
       setTimeout(() => {
-        this.displayDialogType.set(undefined);
+        this.loadExistingGame();
       }, this.DISPLAY_SUCCESS_TIME);
     } catch (error) {
       this.handleRequestError(error);
@@ -88,6 +70,32 @@ export class LandingPageContainer implements OnInit {
 
   protected handleGameFieldChange(gameField: string) {
     this.gameField.set(gameField);
+  }
+
+  private setInitGameField() {
+    this.gameField.set(`###############
+#S............#
+#...####...M..#
+#...#......##.#
+#...#..M......#
+#.............#
+#...####......#
+#...#..Z......#
+#...#.....M...#
+#.............#
+#.......####..#
+#....M..#..#..#
+#.......#..#..#
+#.......####..#
+###############`);
+  }
+
+  private setRandomGameId() {
+    this.gameId.set(
+      Array.from({ length: 12 }, () =>
+        String.fromCharCode(97 + Math.floor(Math.random() * 26))
+      ).join('')
+    );
   }
 
   private handleRequestError(error: unknown) {
