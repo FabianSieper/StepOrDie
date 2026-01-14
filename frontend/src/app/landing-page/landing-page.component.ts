@@ -15,7 +15,11 @@ import { DialogType } from '../model/dialog-type.model';
       <label for="game-id-input" class="space-above">Game ID</label>
       <input id="game-id-input" class="nes-input game-id-input" [(value)]="gameId" />
       <label for="playing-field" class="space-above">Playing Field</label>
-      <textarea id="playing-field" [(ngModel)]="gameField"></textarea>
+      <textarea
+        id="playing-field"
+        (input)="handleGameFieldChanged($event)"
+        [value]="gameField()"
+      ></textarea>
       <button class="nes-btn is-primary" (click)="playClicked.emit()">Play</button>
     </section>
     <div>
@@ -37,10 +41,11 @@ import { DialogType } from '../model/dialog-type.model';
 })
 export class LandingPageComponent {
   readonly displayDialogType = input.required<DialogType | undefined>();
-  readonly gameField = model.required<string>();
+  readonly gameField = input.required<string>();
   readonly gameId = model.required<string>();
 
   readonly playClicked = output();
+  readonly changedGameField = output<string>();
 
   // Outputs of app-info-dialog-component
   readonly submitQuest = output<void>();
@@ -50,4 +55,11 @@ export class LandingPageComponent {
   readonly openFeedbackPackge = output();
 
   protected readonly showInputError = signal(false);
+
+  protected handleGameFieldChanged(event: Event) {
+    const target = event.target as HTMLTextAreaElement;
+    const value = target.value;
+
+    this.changedGameField.emit(value);
+  }
 }

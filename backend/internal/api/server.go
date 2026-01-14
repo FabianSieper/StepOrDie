@@ -6,6 +6,8 @@ import (
 	"net/http"
 
 	"github.com/FabianSieper/StepOrDie/internal/cache"
+	"github.com/FabianSieper/StepOrDie/internal/gameboard"
+	"github.com/FabianSieper/StepOrDie/internal/models/request"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -17,6 +19,33 @@ func NewServer(cache *cache.GameCache) *Server {
 	return &Server{
 		Cache: cache,
 	}
+}
+
+func (s *Server) StoreGameState(w http.ResponseWriter, r *http.Request) {
+
+	var body request.StoreGameStateRequestBody
+	err := json.NewDecoder(r.Body).Decode(&body)
+
+	if err != nil {
+		http.Error(w, "Failed to decode response body", http.StatusBadRequest)
+		return
+	}
+
+	_, ok := s.Cache.Get(body.GameId)
+
+	if ok && !body.Overwrite {
+		http.Error(w, fmt.Sprintf("Existing game for game id %s found. Do you want to overwrite it? Set the parameter 'overwrite' accordingly", body.GameId), http.StatusConflict)
+		return
+	}
+
+	gameState, err := gameboard.ParseScenario(body.PlayingBoard)
+
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to parse game board. Error: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	s.Cache.Set(body.GameId, *gameState)
 }
 
 func (s *Server) LoadGameStateFromCache(w http.ResponseWriter, r *http.Request) {

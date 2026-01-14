@@ -1,7 +1,9 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { DialogType } from '../model/dialog-type.model';
+import { BackendService } from '../services/backend.service';
 import { MusicService } from '../services/music.service';
 import { LandingPageComponent } from './landing-page.component';
 
@@ -10,10 +12,12 @@ import { LandingPageComponent } from './landing-page.component';
   imports: [LandingPageComponent],
   template: `
     <app-landing-page-component
-      [(gameField)]="gameField"
       [(gameId)]="gameId"
+      [gameField]="gameField()"
       [displayDialogType]="displayDialogType()"
-      (submitQuest)="handleEnterClick()"
+      (changedGameField)="handleGameFieldChange($event)"
+      (playClicked)="storeGameState()"
+      (overwriteGame)="overwriteGameState()"
       (loadGame)="loadExistingGame()"
       (resetActiveDialogType)="this.displayDialogType.set(undefined)"
       (openFeedbackPackge)="router.navigate(['/feedback'])"
@@ -24,6 +28,9 @@ export class LandingPageContainer implements OnInit {
   private logger = inject(NGXLogger);
   protected router = inject(Router);
   protected musicService = inject(MusicService);
+  protected backendService = inject(BackendService);
+
+  private readonly DISPLAY_SUCCESS_TIME = 1500;
 
   // Init game id with random string
   protected readonly gameId = signal<string>(
@@ -55,13 +62,52 @@ export class LandingPageContainer implements OnInit {
     this.initMusicService();
   }
 
-  protected async handleEnterClick() {
-    this.displayDialogType.set(undefined);
+  protected async storeGameState(overwrite = false) {
+    this.displayDialogType.set(DialogType.LOADING);
+
+    try {
+      await this.backendService.storeGameState(this.gameId(), this.gameField(), overwrite);
+
+      this.displayDialogType.set(DialogType.SUCCESS);
+
+      setTimeout(() => {
+        this.displayDialogType.set(undefined);
+      }, this.DISPLAY_SUCCESS_TIME);
+    } catch (error) {
+      this.handleRequestError(error);
+    }
+  }
+  protected async overwriteGameState() {
+    await this.storeGameState(true);
   }
 
   protected loadExistingGame() {
     this.logger.info('Loading existing game');
-    // this.router.navigate(['/game', existingGameId]);
+    this.router.navigate(['/game', this.gameId()]);
+  }
+
+  protected handleGameFieldChange(gameField: string) {
+    this.gameField.set(gameField);
+  }
+
+  private handleRequestError(error: unknown) {
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 400) {
+        this.logger.warn(
+          `Failed to parse playing board or request body. Received error: ${error.message}`
+        );
+        this.displayDialogType.set(DialogType.BACKEND_ERROR); // TODO: replace with user error
+      } else if (error.status === 409) {
+        this.logger.warn(`Game state for game id already stored.`);
+        this.displayDialogType.set(DialogType.DUPLICATE_FOUND);
+      } else {
+        this.logger.error(`Failed to store game state. Received error: ${error.message}`);
+        this.displayDialogType.set(DialogType.BACKEND_ERROR);
+      }
+    } else {
+      this.logger.error(`Failed to store game state. Received generic error: ${error}`);
+      this.displayDialogType.set(DialogType.BACKEND_ERROR);
+    }
   }
 
   private initMusicService() {

@@ -7,6 +7,16 @@ import { GameState } from '../model/response/load-game-state.model';
 export class BackendService {
   private httpClient = inject(HttpClient);
 
+  storeGameState(gameId: string, playingBoard: string, overwrite: boolean) {
+    return firstValueFrom(
+      this.httpClient.post<void>(this.getstoreGameStateUrl(), {
+        gameId,
+        playingBoard,
+        overwrite,
+      })
+    );
+  }
+
   loadGameStateFromCache(gameId: string): Promise<GameState> {
     return firstValueFrom(
       this.httpClient.get<GameState>(this.getLoadGameStateFromCacheUrl() + gameId)
@@ -33,5 +43,9 @@ export class BackendService {
 
   protected getSendFeedbackUrl() {
     return `/api/sendFeedback`;
+  }
+
+  protected getstoreGameStateUrl() {
+    return `/api/storeGameState`;
   }
 }
