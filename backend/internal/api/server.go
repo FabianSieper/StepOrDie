@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/FabianSieper/NotionQuest/internal/cache"
-	"github.com/FabianSieper/NotionQuest/internal/gameboard"
-	"github.com/FabianSieper/NotionQuest/internal/models/request"
-	"github.com/FabianSieper/NotionQuest/internal/notion"
+	"github.com/FabianSieper/StepOrDie/internal/cache"
+	"github.com/FabianSieper/StepOrDie/internal/gameboard"
+	"github.com/FabianSieper/StepOrDie/internal/transport/http/request"
+	"github.com/FabianSieper/StepOrDie/internal/transport/http/response/mapper"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -22,7 +22,59 @@ func NewServer(cache *cache.GameCache) *Server {
 	}
 }
 
-func (s *Server) LoadGameStateFromCache(w http.ResponseWriter, r *http.Request) {
+func (s *Server) StoreGameStateFromString(w http.ResponseWriter, r *http.Request) {
+
+	var body request.StoreGameFromStringRequestBody
+	err := json.NewDecoder(r.Body).Decode(&body)
+
+	if err != nil {
+		http.Error(w, "Failed to decode response body", http.StatusBadRequest)
+		return
+	}
+
+	_, ok := s.Cache.Get(body.GameId)
+
+	if ok && !body.Overwrite {
+		http.Error(w, fmt.Sprintf("Existing game for game id %s found. Do you want to overwrite it? Set the parameter 'overwrite' accordingly", body.GameId), http.StatusConflict)
+		return
+	}
+
+	game, err := gameboard.ParseScenario(body.PlayingBoard)
+
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to parse game board. Error: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	s.Cache.Set(body.GameId, game)
+}
+
+func (s *Server) StoreGameState(w http.ResponseWriter, r *http.Request) {
+
+	// TODO: request body does only require state and gameId, nothing else
+	var body request.StoreGameStateRequestBody
+	err := json.NewDecoder(r.Body).Decode(&body)
+
+	if err != nil {
+		http.Error(w, "Failed to decode response body", http.StatusBadRequest)
+		return
+	}
+
+	loadedGame, ok := s.Cache.Get(body.GameId)
+
+	if ok {
+		toBeSavedGameState := mapper.MapResponseGameState(body.Game.State)
+		loadedGame.SavedState = toBeSavedGameState
+		s.Cache.Set(body.GameId, &loadedGame)
+	} else {
+		game := mapper.GameToDomain(body.Game)
+		s.Cache.Set(body.GameId, &game)
+
+	}
+
+}
+
+func (s *Server) LoadGameState(w http.ResponseWriter, r *http.Request) {
 
 	gameId := chi.URLParam(r, "gameId")
 
@@ -33,7 +85,8 @@ func (s *Server) LoadGameStateFromCache(w http.ResponseWriter, r *http.Request) 
 
 	// Load game
 	fmt.Printf("INFO - Trying to load game with id %s\n", gameId)
-	gameState, ok := s.Cache.Get(gameId)
+
+	domaingame, ok := s.Cache.Get(gameId)
 
 	if !ok {
 		http.Error(w, fmt.Sprintf("game with gameId %s was not found in cache", gameId), http.StatusNotFound)
@@ -41,74 +94,13 @@ func (s *Server) LoadGameStateFromCache(w http.ResponseWriter, r *http.Request) 
 	}
 	fmt.Printf("INFO - Successfully loaded game with id %s\n", gameId)
 
+	responseGame := mapper.GameFromDomain(domaingame)
+
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(gameState)
+	err := json.NewEncoder(w).Encode(responseGame)
 
 	if err != nil {
 		http.Error(w, "Could not encode game state", http.StatusInternalServerError)
-		return
-	}
-}
-
-func (s *Server) LoadGameStateFromNotionHandler(w http.ResponseWriter, r *http.Request) {
-
-	if r.Method != http.MethodPost {
-		http.Error(w, fmt.Sprintf("only POST method is allowed: received %s", r.Method), http.StatusMethodNotAllowed)
-		return
-	}
-
-	var requestBody request.LoadGameStateFromNotionRequestBody
-
-	err := json.NewDecoder(r.Body).Decode(&requestBody)
-
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to read request body: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	responseBody, err := gameboard.ExtractPageIdFromNotionUrl(requestBody.NotionUrl)
-
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to extract page ID from Notion URL: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	_, ok := s.Cache.Get(responseBody.PageId)
-
-	shouldOverwrite := r.URL.Query().Get("overwrite") == "true"
-
-	// Still continue and overwrite if user sent an corresponding parameter = true
-	if ok && !requestBody.Overwrite && !shouldOverwrite {
-		http.Error(w, fmt.Sprintf("Game with page ID %s already exists in cache", responseBody.PageId), http.StatusConflict)
-		return
-	} else if ok {
-		fmt.Printf("INFO - Overwriting existing game with page ID %s\n", responseBody.PageId)
-	}
-
-	resp, err := notion.GetPublicNotionPageContent(requestBody.NotionUrl)
-
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to load Notion page: %v", err), http.StatusInternalServerError)
-		return
-	}
-	fmt.Printf("INFO - Successfully loaded Notion page content\n")
-
-	parsedGameField, err := gameboard.ParseScenario(resp)
-
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to parse Notion page content into game field: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	// Store the parsed game field in the cache
-	s.Cache.Set(responseBody.PageId, *parsedGameField)
-	fmt.Printf("INFO - Saved game with id %s\n", responseBody.PageId)
-
-	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(responseBody)
-
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to encode response: %v", err), http.StatusInternalServerError)
 		return
 	}
 }

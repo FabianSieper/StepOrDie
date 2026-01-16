@@ -25,9 +25,13 @@ export interface EnemyDto {
 }
 
 export interface GameState {
+  player: PlayerDto;
+  enemies: EnemyDto[];
+}
+
+export interface Game {
   width: number;
   height: number;
   grid: TileType[][];
-  player: PlayerDto;
-  enemies: EnemyDto[];
+  state: GameState;
 }

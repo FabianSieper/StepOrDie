@@ -15,8 +15,10 @@
     flex-direction: column;
 }
 
-.take-me-back-button {
+.button-row {
+    display: flex;
     transform: scale(0.9);
     margin-top: 10px;
+    gap: 10px;
 }
 

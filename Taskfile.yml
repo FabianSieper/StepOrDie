@@ -1,10 +1,10 @@
 version: '3'
 
 env: 
-  BACKEND_IMAGE_TAG: notionquestbackend
-  BACKEND_CONTAINER_NAME: notionQuestBackend
-  FRONTEND_IMAGE_TAG: notionquestfrontend
-  FRONTEND_CONTAINER_NAME: notionQuestFrontend
+  BACKEND_IMAGE_TAG: stepordiebackend
+  BACKEND_CONTAINER_NAME: stepOrDieBackend
+  FRONTEND_IMAGE_TAG: stepordiefrontend
+  FRONTEND_CONTAINER_NAME: stepOrDieFrontend
   FRONTEND_PORT: 4200
   BACKEND_PORT: 8081
 
@@ -31,18 +31,10 @@ tasks:
     cmds:
       - docker-compose down
 
-  test-load-game-state-from-notion:
-    desc: "Send a sample request to /loadGameStateFromNotion (backend must be running)"
-    cmds:
-      - |
-        curl -vX POST http://localhost:8081/api/loadGameStateFromNotion \
-          -H 'Content-Type: application/json' \
-          --data '{"notionUrl":"https://fabiansieper.notion.site/Notion-Quest-2c25e55239fb80f78f9df3fa2c2d65d1"}'
-
   test-send-feedback-to-notion:
     desc: "Send a sample request to /sendFeedback (backend must be running)"
     cmds:
       - |
         curl -vX POST http://localhost:8081/api/sendFeedback \
           -H 'Content-Type: application/json' \
-          --data '{"name":"Codex Tester","feedback":"Really enjoying NotionQuest!"}'
+          --data '{"name":"Codex Tester","feedback":"Really enjoying Step or Die!"}'

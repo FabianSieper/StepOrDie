@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FabianSieper/NotionQuest/internal/config"
-	"github.com/FabianSieper/NotionQuest/internal/notion/dto"
+	"github.com/FabianSieper/StepOrDie/internal/config"
+	"github.com/FabianSieper/StepOrDie/internal/notion/dto"
 	"github.com/chromedp/chromedp"
 )
 

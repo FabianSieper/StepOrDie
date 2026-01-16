@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/FabianSieper/NotionQuest/internal/api"
-	"github.com/FabianSieper/NotionQuest/internal/cache"
-	"github.com/FabianSieper/NotionQuest/internal/config"
+	"github.com/FabianSieper/StepOrDie/internal/api"
+	"github.com/FabianSieper/StepOrDie/internal/cache"
+	"github.com/FabianSieper/StepOrDie/internal/config"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 )
@@ -49,9 +49,10 @@ func createRouter() *chi.Mux {
 }
 
 func addHandler(server *api.Server, router *chi.Mux) {
-	router.Post("/api/loadGameStateFromNotion", server.LoadGameStateFromNotionHandler)
 	router.Post("/api/sendFeedback", api.SendFeedbackToNotion)
-	router.Get("/api/loadGameStateFromCache/{gameId}", server.LoadGameStateFromCache)
+	router.Post("/api/storeGameStateFromString", server.StoreGameStateFromString)
+	router.Post("/api/storeGameState", server.StoreGameState)
+	router.Get("/api/loadGameStateFromCache/{gameId}", server.LoadGameState)
 	router.Get("/api/version", api.ProjectVersionHandler)
 }
 

@@ -9,23 +9,33 @@
 }
 
 .landing-shell {
-    max-width: 800px;
-    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .label-input {
     padding-left: 10px;
 }
 
-.nes-input {
-  font-family: 'Press Start 2P', system-ui, sans-serif;
-  caret-color: #32ff7e; /* neon green arcade caret */
+.space-above {
+    margin-top: 10px;
 }
 
-.input-line {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.game-id-input {
+    width: 300px;
+    margin-top: 0px;
+    border: 0px;
+    text-align: center;
+}
+
+textarea {
+    width: 300px;
+    aspect-ratio: 0.7 / 1; 
+    resize: none;
+    font-size: 19px;
+    padding-inline-start: 8px;
+    margin-bottom: 10px;
 }
 
 h1 {
@@ -35,9 +45,4 @@ h1 {
 .feedback-button {
     transform: scale(0.9);          
     margin: 0px;
-}
-
-.input-error {
-    border-color: #ff4d4f !important;
-    box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.3);
 }

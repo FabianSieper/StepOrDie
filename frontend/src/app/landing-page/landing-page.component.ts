@@ -1,33 +1,26 @@
-import { Component, input, model, output, signal, viewChild } from '@angular/core';
+import { Component, input, model, output, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { InfoDialogComponent } from '../components/info-dialog/info-dialog.component';
-import { MessageDialogComponent } from '../components/message-dialog/message-dialog.component';
 import { MusicButtonContainer } from '../components/music-button/music-button.container';
 import { VersionContainer } from '../components/version/version.container';
 import { DialogType } from '../model/dialog-type.model';
 
 @Component({
   selector: 'app-landing-page-component',
-  imports: [InfoDialogComponent, MusicButtonContainer, VersionContainer],
+  imports: [InfoDialogComponent, MusicButtonContainer, VersionContainer, FormsModule],
   template: `
     @if (!displayDialogType()) {
     <section class="nes-container is-rounded landing-shell is-dark">
-      <h1>Welcome to NotionQuest!</h1>
-
-      <div class="nes-field">
-        <label for="quest-input" class="label-input">Pitch your quest</label>
-        <div class="input-line">
-          <input
-            id="quest-input"
-            type="text"
-            class="nes-input"
-            [class.input-error]="showInputError()"
-            placeholder="Enter public Notion Page URL"
-            [value]="notionUrl()"
-            (input)="onNotionUrlInput($event)"
-          />
-          <button type="button" (click)="onSubmitClicked()" class="nes-btn is-primary">Go!</button>
-        </div>
-      </div>
+      <h1>Step or Die!</h1>
+      <label for="game-id-input" class="space-above">Game ID</label>
+      <input id="game-id-input" class="nes-input game-id-input" [(ngModel)]="gameId" />
+      <label for="playing-field" class="space-above">Playing Field</label>
+      <textarea
+        id="playing-field"
+        (input)="handleGameFieldChanged($event)"
+        [value]="gameField()"
+      ></textarea>
+      <button class="nes-btn is-primary" (click)="playClicked.emit()">Play</button>
     </section>
     <div>
       <button class="nes-btn feedback-button" (click)="openFeedbackPackge.emit()">Feedback</button>
@@ -39,7 +32,6 @@ import { DialogType } from '../model/dialog-type.model';
 
     <app-info-dialog-component
       [displayDialogType]="displayDialogType()"
-      loadingHeaderAppendix="from Notion"
       (resetActiveDialogType)="resetActiveDialogType.emit()"
       (loadGame)="loadGame.emit()"
       (overwriteGame)="overwriteGame.emit()"
@@ -49,35 +41,25 @@ import { DialogType } from '../model/dialog-type.model';
 })
 export class LandingPageComponent {
   readonly displayDialogType = input.required<DialogType | undefined>();
-  readonly notionUrl = model.required<string>();
+  readonly gameField = input.required<string>();
+  readonly gameId = model.required<string>();
+
+  readonly playClicked = output();
+  readonly changedGameField = output<string>();
+
+  // Outputs of app-info-dialog-component
   readonly submitQuest = output<void>();
   readonly overwriteGame = output<void>();
   readonly loadGame = output<void>();
   readonly resetActiveDialogType = output();
   readonly openFeedbackPackge = output();
+
   protected readonly showInputError = signal(false);
 
-  private readonly messageDialogRef = viewChild(MessageDialogComponent);
+  protected handleGameFieldChanged(event: Event) {
+    const target = event.target as HTMLTextAreaElement;
+    const value = target.value;
 
-  get messageDialog(): MessageDialogComponent | undefined {
-    return this.messageDialogRef();
-  }
-
-  protected onNotionUrlInput(event: Event): void {
-    const value = (event.target as HTMLInputElement | null)?.value ?? '';
-    this.notionUrl.set(value);
-    if (value.trim().length > 0 && this.showInputError()) {
-      this.showInputError.set(false);
-    }
-  }
-
-  protected onSubmitClicked(): void {
-    if (!this.notionUrl().trim()) {
-      this.showInputError.set(true);
-      return;
-    }
-
-    this.showInputError.set(false);
-    this.submitQuest.emit();
+    this.changedGameField.emit(value);
   }
 }

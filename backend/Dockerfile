@@ -16,8 +16,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o /main ./main.go
 
 # --- STAGE 2: Runtime ---
-# Use the chromedp/headless-shell image which already bundles a supported Chrome binary.
-FROM chromedp/headless-shell:latest
+  FROM gcr.io/distroless/static-debian12
 
 # Install CA certificates so outbound HTTPS (e.g. Notion API) works from the container.
 RUN apt-get update \
@@ -30,9 +29,6 @@ USER appuser
 
 # Copy the compiled binary from the builder stage
 COPY --from=builder /main /app/main
-
-# Point chromedp at the headless-shell binary shipped with this image.
-ENV CHROMEDP_EXEC_PATH=/headless-shell/headless-shell
 
 # Expose the port app runs on
 EXPOSE 8081

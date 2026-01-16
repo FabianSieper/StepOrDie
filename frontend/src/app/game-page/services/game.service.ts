@@ -3,7 +3,7 @@ import { NGXLogger } from 'ngx-logger';
 import { BackendService } from '../../services/backend.service';
 import { Animator } from '../core-game/animator';
 import { Drawer } from '../core-game/drawer';
-import { mapToGame } from '../mapper/game.mapper';
+import { mapToDomainGame, mapToDtoGame } from '../mapper/game.mapper';
 import { Game, GameStatus } from '../model/game.model';
 import { KeyInputService } from './key-input.service';
 
@@ -45,12 +45,25 @@ export class GameService {
     this._status.set(GameStatus.ONGOING);
   }
 
+  async saveGameState(gameId: string) {
+    const game = this._game();
+
+    if (!game) {
+      this.logger.warn('Failed to save game state, as game object is undefined');
+      return;
+    }
+
+    this.logger.info(`Mapping domain game object to dto game object`);
+    const dtoGame = mapToDtoGame(game);
+    this.logger.info(`Sending game state to backend`);
+    await this.backendService.storeGameState(gameId, dtoGame);
+    this.logger.info(`Successfully saved game state`);
+  }
+
   async loadGameState(gameId: string) {
     this.logger.info(`Loading game with game id ${gameId}`);
     const loadedGame = await this.backendService.loadGameStateFromCache(gameId);
-    this._game.set(await mapToGame(loadedGame));
-
-    this.logger.info(`Successfully loaded game with ${gameId}`);
+    this._game.set(await mapToDomainGame(loadedGame));
   }
 
   async computationStep(ctx: CanvasRenderingContext2D | undefined) {

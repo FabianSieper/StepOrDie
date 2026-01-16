@@ -1,4 +1,4 @@
-module github.com/FabianSieper/NotionQuest
+module github.com/FabianSieper/StepOrDie
 
 go 1.25.4
 

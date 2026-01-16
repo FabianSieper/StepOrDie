@@ -1,33 +1,33 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { LoadGameStateFromNotionRequest } from '../model/request/load-game-state-from-notion.model';
-import { LoadGameStateFromNotionResponse } from '../model/response/load-game-state-from-notion.model';
-import { GameState } from '../model/response/load-game-state.model';
+import { Game } from '../model/game.model';
 
 @Injectable({ providedIn: 'root' })
 export class BackendService {
   private httpClient = inject(HttpClient);
 
-  loadGameStateFromNotion(
-    notionUrl: string,
-    overwrite: boolean
-  ): Promise<LoadGameStateFromNotionResponse> {
-    const body: LoadGameStateFromNotionRequest = { notionUrl };
-    const params = new HttpParams().set('overwrite', overwrite ? 'true' : 'false');
+  storeGameStateFromString(gameId: string, playingBoard: string, overwrite: boolean) {
     return firstValueFrom(
-      this.httpClient.post<LoadGameStateFromNotionResponse>(
-        this.getLoadGameStateFromNotionUrl(),
-        body,
-        { params }
-      )
+      this.httpClient.post<void>(this.getstoreGameStateFromStringUrl(), {
+        gameId,
+        playingBoard,
+        overwrite,
+      })
     );
   }
 
-  loadGameStateFromCache(gameId: string): Promise<GameState> {
+  storeGameState(gameId: string, game: Game) {
     return firstValueFrom(
-      this.httpClient.get<GameState>(this.getLoadGameStateFromCacheUrl() + gameId)
+      this.httpClient.post<void>(this.getstoreGameStateUrl(), {
+        gameId,
+        game,
+      })
     );
+  }
+
+  loadGameStateFromCache(gameId: string): Promise<Game> {
+    return firstValueFrom(this.httpClient.get<Game>(this.getLoadGameStateFromCacheUrl() + gameId));
   }
 
   sendFeedback(name: string, feedback: string): Promise<void> {
@@ -52,7 +52,11 @@ export class BackendService {
     return `/api/sendFeedback`;
   }
 
-  protected getLoadGameStateFromNotionUrl() {
-    return `/api/loadGameStateFromNotion`;
+  protected getstoreGameStateUrl() {
+    return `/api/storeGameState`;
+  }
+
+  protected getstoreGameStateFromStringUrl() {
+    return `/api/storeGameStateFromString`;
   }
 }

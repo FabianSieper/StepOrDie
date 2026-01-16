@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/FabianSieper/NotionQuest/internal/models/request"
-	"github.com/FabianSieper/NotionQuest/internal/notion"
+	"github.com/FabianSieper/StepOrDie/internal/notion"
+	"github.com/FabianSieper/StepOrDie/internal/transport/http/request"
 )
 
 func SendFeedbackToNotion(w http.ResponseWriter, r *http.Request) {

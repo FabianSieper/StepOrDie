@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
@@ -11,11 +12,13 @@ import { LandingPageComponent } from './landing-page.component';
   imports: [LandingPageComponent],
   template: `
     <app-landing-page-component
-      [(notionUrl)]="notionUrl"
+      [(gameId)]="gameId"
+      [gameField]="gameField()"
       [displayDialogType]="displayDialogType()"
-      (submitQuest)="handleEnterClick()"
+      (changedGameField)="handleGameFieldChange($event)"
+      (playClicked)="storeGameState()"
+      (overwriteGame)="overwriteGameState()"
       (loadGame)="loadExistingGame()"
-      (overwriteGame)="requestLoadingInitialPlayingBoard(true)"
       (resetActiveDialogType)="this.displayDialogType.set(undefined)"
       (openFeedbackPackge)="router.navigate(['/feedback'])"
     />
@@ -23,74 +26,100 @@ import { LandingPageComponent } from './landing-page.component';
 })
 export class LandingPageContainer implements OnInit {
   private logger = inject(NGXLogger);
-  private backendService = inject(BackendService);
   protected router = inject(Router);
   protected musicService = inject(MusicService);
+  protected backendService = inject(BackendService);
 
-  protected readonly notionUrl = signal<string>(
-    'https://fabiansieper.notion.site/Notion-Quest-2c25e55239fb80f78f9df3fa2c2d65d1?source=copy_link'
-  );
+  private readonly DISPLAY_SUCCESS_TIME = 1500;
+
+  protected readonly gameId = signal<string>('');
+  protected readonly gameField = signal<string>('');
 
   protected readonly displayDialogType = signal<DialogType | undefined>(undefined);
   protected readonly version = signal<string | undefined>(undefined);
 
-  private lastDuplicateNotionPageId: string | undefined = undefined;
-
   async ngOnInit(): Promise<void> {
+    this.setInitGameField();
+    this.setRandomGameId();
     this.initMusicService();
   }
 
-  protected async handleEnterClick() {
-    this.displayDialogType.set(undefined);
-    this.lastDuplicateNotionPageId = undefined;
+  protected async storeGameState(overwrite = false) {
+    this.displayDialogType.set(DialogType.LOADING);
 
-    this.logger.info('Notion URL submitted:', this.notionUrl());
+    try {
+      await this.backendService.storeGameStateFromString(
+        this.gameId(),
+        this.gameField(),
+        overwrite
+      );
+      this.displayDialogType.set(DialogType.SUCCESS);
 
-    if (this.isNotionUrlEmpty()) {
-      this.logger.warn('Provided Notion URL is empty:', this.notionUrl());
-      this.displayDialogType.set(DialogType.NOTION_URL_EMPTY);
-      return;
+      // Open game page after some time
+      setTimeout(() => {
+        this.loadExistingGame();
+      }, this.DISPLAY_SUCCESS_TIME);
+    } catch (error) {
+      this.handleRequestError(error);
     }
-
-    if (!this.isNotionUrlValid()) {
-      this.logger.warn('Provided Notion URL is not valid:', this.notionUrl());
-      this.displayDialogType.set(DialogType.INVALID_NOTION_URL);
-      return;
-    }
-
-    await this.requestLoadingInitialPlayingBoard();
+  }
+  protected async overwriteGameState() {
+    await this.storeGameState(true);
   }
 
   protected loadExistingGame() {
-    const existingGameId = this.lastDuplicateNotionPageId;
-
-    if (!existingGameId) {
-      this.logger.error('Not able to load existing ame, as the existing game id is undefined');
-      return;
-    }
-
     this.logger.info('Loading existing game');
-    this.router.navigate(['/game', existingGameId]);
+    this.router.navigate(['/game', this.gameId()]);
   }
 
-  protected async requestLoadingInitialPlayingBoard(overwrite = false) {
-    try {
-      this.displayDialogType.set(DialogType.LOADING);
-      this.logger.info('Sending request to load initial playing board...');
-      const response = await this.backendService.loadGameStateFromNotion(
-        this.notionUrl(),
-        overwrite
-      );
-      this.logger.info('Successfully loaded initial playing board. Received Response: ', response);
-      this.displayDialogType.set(DialogType.SUCCESS);
+  protected handleGameFieldChange(gameField: string) {
+    this.gameField.set(gameField);
+  }
 
-      // Open game pager after
-      setTimeout(() => {
-        this.displayDialogType.set(undefined);
-        this.router.navigate(['/game', response.pageId]);
-      }, 2500);
-    } catch (error) {
-      this.handleError(error as Error);
+  private setInitGameField() {
+    this.gameField.set(`###############
+#S............#
+#...####...M..#
+#...#......##.#
+#...#..M......#
+#.............#
+#...####......#
+#...#..Z......#
+#...#.....M...#
+#.............#
+#.......####..#
+#....M..#..#..#
+#.......#..#..#
+#.......####..#
+###############`);
+  }
+
+  private setRandomGameId() {
+    this.gameId.set(
+      Array.from({ length: 12 }, () =>
+        String.fromCharCode(97 + Math.floor(Math.random() * 26))
+      ).join('')
+    );
+  }
+
+  private handleRequestError(error: unknown) {
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 400) {
+        this.logger.warn(
+          `Failed to parse playing board or request body. Received error: ${error.message}`
+        );
+        // TODO: parsing seems to work even though there are invalid characters contained
+        this.displayDialogType.set(DialogType.USER_INPUT_ERROR);
+      } else if (error.status === 409) {
+        this.logger.warn(`Game state for game id already stored.`);
+        this.displayDialogType.set(DialogType.DUPLICATE_FOUND);
+      } else {
+        this.logger.error(`Failed to store game state. Received error: ${error.message}`);
+        this.displayDialogType.set(DialogType.BACKEND_ERROR);
+      }
+    } else {
+      this.logger.error(`Failed to store game state. Received generic error: ${error}`);
+      this.displayDialogType.set(DialogType.BACKEND_ERROR);
     }
   }
 
@@ -102,38 +131,5 @@ export class LandingPageContainer implements OnInit {
       // Music from https://pixabay.com/music/video-games-i-love-my-8-bit-game-console-301272/
       this.musicService.setAudioSrc('assets/audio/landing-page.mp3', true);
     }
-  }
-
-  private handleError(error: Error) {
-    this.logger.warn('Error loading initial playing board:', error);
-
-    // HTTP 409 indicates that there is already a game for the provided Notion page
-    if (error.message.includes('409')) {
-      this.displayDialogType.set(DialogType.DUPLICATE_FOUND);
-      // Store notion URL for later
-      this.lastDuplicateNotionPageId = this.extractNotionPageId(this.notionUrl());
-    } else {
-      this.displayDialogType.set(DialogType.BACKEND_ERROR);
-    }
-  }
-
-  private extractNotionPageId(url: string): string | undefined {
-    if (!url) return undefined;
-    try {
-      const parsed = new URL(url);
-      const slug = parsed.pathname.split('/').filter(Boolean).pop();
-      if (!slug) return undefined;
-      return slug.split('?')[0];
-    } catch {
-      return undefined;
-    }
-  }
-
-  private isNotionUrlEmpty(): boolean {
-    return this.notionUrl().trim().length === 0;
-  }
-
-  private isNotionUrlValid(): boolean {
-    return this.notionUrl().includes('.notion.site/');
   }
 }

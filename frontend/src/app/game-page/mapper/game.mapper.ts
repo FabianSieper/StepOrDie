@@ -1,35 +1,44 @@
-import { EnemyDto, GameState, TileType } from '../../model/response/load-game-state.model';
+import { EnemyDto, EnemyType, GameState, Game as DtoGame, TileType } from '../../model/game.model';
 import { Enemy } from '../core-game/entities/enemy';
 import { Player } from '../core-game/entities/player';
 import { Tile } from '../core-game/entities/tile';
-import { Game, PlayingBoard, Visuals } from '../model/game.model';
+import { Game as DomainGame, PlayingBoard, Visuals } from '../model/game.model';
 
-export async function mapToGame(gameState: GameState): Promise<Game> {
+export async function mapToDomainGame(Game: DtoGame): Promise<DomainGame> {
   return {
-    player: await extractPlayer(gameState),
-    enemies: await extractEnemies(gameState),
-    tiles: await extractTiles(gameState),
-    playingBoard: extractPlayingBoard(gameState),
+    player: await extractPlayer(Game.state),
+    enemies: await extractEnemies(Game.state),
+    tiles: await extractTiles(Game),
+    playingBoard: extractPlayingBoard(Game),
   };
 }
 
-async function extractTiles(gameState: GameState): Promise<Tile[][]> {
-  return await mapToTiles(gameState);
+export function mapToDtoGame(game: DomainGame): DtoGame {
+  return {
+    width: game.playingBoard.amountFieldsX,
+    height: game.playingBoard.amountFieldsY,
+    grid: mapTilesToGrid(game.tiles),
+    state: mapDomainState(game),
+  };
 }
 
-async function mapToTiles(gameState: GameState): Promise<Tile[][]> {
+async function extractTiles(Game: DtoGame): Promise<Tile[][]> {
+  return await mapToTiles(Game);
+}
+
+async function mapToTiles(Game: DtoGame): Promise<Tile[][]> {
   const floorVisuals = await mapFloorVisuals();
   const mountainsVisuals = await mapMountainsVisuals();
   const castleVisuals = await mapCastleVisuals();
 
-  const tiles = Array.from({ length: gameState.grid.length }, () =>
-    Array(gameState.grid[0].length).fill(undefined)
+  const tiles = Array.from({ length: Game.grid.length }, () =>
+    Array(Game.grid[0].length).fill(undefined)
   );
 
   // For each tile, compute the corresponding Game Elements based on the tile type
   for (let row = 0; row < tiles.length; row++) {
     for (let col = 0; col < tiles[0].length; col++) {
-      switch (gameState.grid[row][col]) {
+      switch (Game.grid[row][col]) {
         case TileType.FLOOR: {
           tiles[row][col] = createTileGameElement(TileType.FLOOR, floorVisuals, col, row);
           break;
@@ -98,10 +107,10 @@ async function mapMountainsVisuals(): Promise<Visuals> {
   );
 }
 
-function extractPlayingBoard(gameState: GameState): PlayingBoard {
+function extractPlayingBoard(Game: DtoGame): PlayingBoard {
   return {
-    amountFieldsX: gameState.width,
-    amountFieldsY: gameState.height,
+    amountFieldsX: Game.width,
+    amountFieldsY: Game.height,
   };
 }
 
@@ -146,6 +155,40 @@ async function loadAssetAsImage(path: string) {
   image.src = path;
   await image.decode();
   return image;
+}
+
+function mapDomainState(game: DomainGame): GameState {
+  return {
+    player: {
+      position: { ...game.player.getPosition() },
+    },
+    enemies: mapDomainEnemies(game.enemies),
+  };
+}
+
+function mapDomainEnemies(enemies: Enemy[]): EnemyDto[] {
+  return enemies.map((enemy, index) => ({
+    id: `enemy_${index + 1}`,
+    position: { ...enemy.getPosition() },
+    type: EnemyType.MONSTER,
+  }));
+}
+
+function mapTilesToGrid(tiles: Tile[][]): TileType[][] {
+  return tiles.map((row) =>
+    row.map((tile) => {
+      if (!tile) {
+        return TileType.UNKNOWN;
+      }
+      if (tile.isGoal()) {
+        return TileType.GOAL;
+      }
+      if (tile.isWalkable()) {
+        return TileType.FLOOR;
+      }
+      return TileType.WALL;
+    })
+  );
 }
 
 function createSpriteDetails(

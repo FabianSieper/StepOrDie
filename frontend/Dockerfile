@@ -11,7 +11,7 @@ RUN npm run build
 
 FROM caddy:2-alpine
 
-COPY --from=builder /app/dist/NotionQuestFrontend/browser /usr/share/caddy
+COPY --from=builder /app/dist/StepOrDieFrontend/browser /usr/share/caddy
 COPY Caddyfile /etc/caddy/Caddyfile
 
 # Required so that the caddyfile can read the property and forward the requests to the backend

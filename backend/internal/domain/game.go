@@ -1,4 +1,4 @@
-package response
+package domain
 
 // 1. Basic building blocks
 // ---------------------------------------------------------
@@ -39,22 +39,18 @@ type Enemy struct {
 	Type     EnemyType `json:"type"`
 }
 
-// 3. The full picture (game state)
-// ---------------------------------------------------------
-
-// GameState is the object returned by the API endpoint.
-type GameState struct {
-	// Metadata
+type Game struct {
 	Width  int `json:"width"`
 	Height int `json:"height"`
 
-	// Layer 0: the static map
-	// Represented as a 2D array of strings.
-	// IMPORTANT: there are no 'S' or 'M' characters here anymore.
-	// Cells that currently hold monsters are still just "FLOOR".
 	Grid [][]TileType `json:"grid"`
 
-	// Layer 1: dynamic actors
+	// Domain game objects contains two states, while the http response object only contains one
+	InitialState GameState `json:"initialState"`
+	SavedState   GameState `json:"SavedState"`
+}
+
+type GameState struct {
 	Player  Player  `json:"player"`
 	Enemies []Enemy `json:"enemies"`
 }

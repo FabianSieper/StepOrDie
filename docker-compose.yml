@@ -1,12 +1,12 @@
 services:
-  notion-quest-frontend:
+  step-or-die-frontend:
     build: ./frontend
     ports:
       - "4200:4200"
     environment:
-      - BACKEND_UPSTREAM=notion-quest-backend:8081
+      - BACKEND_UPSTREAM=step-or-die-backend:8081
 
-  notion-quest-backend:
+  step-or-die-backend:
     build: ./backend
     ports:
       - "8081:8081"
@@ -15,7 +15,7 @@ services:
     environment:
       - LATEST_TAG=${LATEST_TAG}
 
-  notion-quest-tunnel:
+  step-or-die-tunnel:
     image: cloudflare/cloudflared:latest
     restart: unless-stopped
     command: tunnel run

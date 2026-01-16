@@ -95,23 +95,19 @@ export class InfoDialogComponent implements OnInit {
         switchParagraphsAfterMs: 2000,
       },
     ],
+    [
+      DialogType.USER_INPUT_ERROR,
+      {
+        paragraphs: [
+          'Information you entered seems to be incorrect.',
+          'Please verify that a gameId is set and the playing board is valid.',
+          'A valid playing board has the same amount of rows and columns, each of equal length and only consists of the following characters: #, S, ., Z and M. Also only one character S is allowed.',
+        ],
+        addOkButtonForClosing: true,
+        header: 'All your fault',
+      },
+    ],
     [DialogType.SUCCESS, { paragraphs: undefined, header: 'Success!' }],
-    [
-      DialogType.NOTION_URL_EMPTY,
-      {
-        paragraphs: ['It seems you have not entered anything.'],
-        header: 'Thats not how things work',
-        addOkButtonForClosing: true,
-      },
-    ],
-    [
-      DialogType.INVALID_NOTION_URL,
-      {
-        paragraphs: ['The URL you entered does not seem to be a valid Notion URL.'],
-        header: 'Na aaah',
-        addOkButtonForClosing: true,
-      },
-    ],
     [DialogType.ARE_YOU_SURE, undefined], // Is handled via are-you-sure-dialog.component.ts
     [DialogType.DUPLICATE_FOUND, undefined], // Is handled via are-you-sure-dialog.component.ts
     [DialogType.WON, undefined], // Is handled via app-lost-or-won-dialog-component.component.ts

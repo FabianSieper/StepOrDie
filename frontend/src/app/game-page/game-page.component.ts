@@ -1,9 +1,9 @@
 import { Component, input, output } from '@angular/core';
 import { InfoDialogComponent } from '../components/info-dialog/info-dialog.component';
 import { MusicButtonContainer } from '../components/music-button/music-button.container';
+import { VersionContainer } from '../components/version/version.container';
 import { DialogType } from '../model/dialog-type.model';
 import { GameContainer } from './components/game/game.container';
-import { VersionContainer } from '../components/version/version.container';
 
 @Component({
   selector: 'app-game-page-component',
@@ -29,7 +29,10 @@ import { VersionContainer } from '../components/version/version.container';
         (gameLost)="gameLost.emit()"
         (gameWon)="gameWon.emit()"
       />
-      <button (click)="backClicked.emit()" class="nes-btn take-me-back-button">Take me back</button>
+      <div class="button-row">
+        <button (click)="backClicked.emit()" class="nes-btn">Take me back</button>
+        <button (click)="saveGameState.emit()" class="nes-btn is-primary">Save</button>
+      </div>
       <app-music-button-container />
       <app-version-container />
     </div>
@@ -45,4 +48,5 @@ export class GamePageComponent {
   readonly backToMenu = output();
   readonly gameWon = output();
   readonly gameLost = output();
+  readonly saveGameState = output();
 }

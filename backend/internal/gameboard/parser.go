@@ -3,12 +3,11 @@ package gameboard
 import (
 	"fmt"
 	"strings"
-	"unicode"
 
-	"github.com/FabianSieper/NotionQuest/internal/models/response"
+	"github.com/FabianSieper/StepOrDie/internal/domain"
 )
 
-// ParseScenario interprets the textual board pulled from Notion, for example:
+// ParseScenario interprets the textual board, for example:
 // ####################
 // #S.................#
 // #...####...M.......#
@@ -18,54 +17,56 @@ import (
 // #...####...........#
 // #...#..Z...........#
 // ####################
-func ParseScenario(raw string) (*response.GameState, error) {
+func ParseScenario(raw string) (*domain.Game, error) {
 	rows := strings.Split(raw, "\n")
 	// Rows come from top to bottom, so each string represents the Y axis,
 	// while characters within the row walk along the X axis from left to right.
-	rows = sanitizeRows(rows)
 
 	amountRows, amountCols, err := getAmountRowsAndCols(rows)
 
 	if err != nil {
-		return &response.GameState{}, err
+		return &domain.Game{}, err
 	}
 
 	grid, err := parseGrid(rows)
 
 	if err != nil {
-		return &response.GameState{}, err
+		return &domain.Game{}, err
 	}
 
 	playerPosition, err := getPlayerPosition(rows)
 
 	if err != nil {
-		return &response.GameState{}, err
+		return &domain.Game{}, err
 	}
 
 	enemies := extractEnemies(rows)
 
-	return &response.GameState{
-		Width:  amountCols,
-		Height: amountRows,
-		Grid:   grid,
-		Player: response.Player{
-			Position: playerPosition,
-		},
+	initialGameState := domain.GameState{
+		Player:  domain.Player{Position: playerPosition},
 		Enemies: enemies,
+	}
+
+	return &domain.Game{
+		Width:        amountCols,
+		Height:       amountRows,
+		Grid:         grid,
+		InitialState: initialGameState,
+		SavedState:   initialGameState, // At the beginning, the saved game state is the same as the initial game state
 	}, nil
 }
 
-func extractEnemies(rows []string) []response.Enemy {
-	enemies := make([]response.Enemy, 0)
+func extractEnemies(rows []string) []domain.Enemy {
+	enemies := make([]domain.Enemy, 0)
 	index := 1
 	for y, row := range rows {
 		for x, char := range row {
 			if char == 'M' {
 				enemyId := fmt.Sprintf("enemy_%d", index)
-				enemies = append(enemies, response.Enemy{
+				enemies = append(enemies, domain.Enemy{
 					ID:       enemyId,
-					Position: response.Position{X: x, Y: y},
-					Type:     response.EnemyTypeMonster,
+					Position: domain.Position{X: x, Y: y},
+					Type:     domain.EnemyTypeMonster,
 				})
 				index++
 			}
@@ -75,49 +76,42 @@ func extractEnemies(rows []string) []response.Enemy {
 	return enemies
 }
 
-func ExtractPageIdFromNotionUrl(notionUrl string) (response.LoadNotionResponseBody, error) {
-	// TODO: https://fabiansieper.notion.site/Notion-Quest-2c25e55239fb80f78f9df3fa2c2d65d1?source=copy_link
-	parts := strings.Split(notionUrl, "/")
+func getPlayerPosition(rows []string) (domain.Position, error) {
+	var playerPosition domain.Position
 
-	// Should at least be split into two parts
-	if len(parts) < 2 {
-		return response.LoadNotionResponseBody{PageId: ""}, fmt.Errorf("invalid Notion URL: %s", notionUrl)
-	}
-
-	// Remove query parameter at the end
-	if strings.ContainsRune(parts[len(parts)-1], '?') {
-		// select first part before ? of Notion-Quest-2c25e55239fb80f78f9df3fa2c2d65d1?source=copy_link
-		subParts := strings.Split(parts[len(parts)-1], "?")
-		return response.LoadNotionResponseBody{PageId: subParts[0]}, nil
-	}
-
-	return response.LoadNotionResponseBody{PageId: parts[len(parts)-1]}, nil
-}
-
-func getPlayerPosition(rows []string) (response.Position, error) {
 	for y, row := range rows {
 		for x, char := range row {
 			if char == 'S' {
-				return response.Position{X: x, Y: y}, nil
+				if playerPosition != (domain.Position{}) {
+					return domain.Position{}, fmt.Errorf("multiple occurences of character 'S' found. Only one is allowed.")
+				}
+
+				playerPosition = domain.Position{X: x, Y: y}
 			}
 		}
 	}
 
-	return response.Position{}, fmt.Errorf("player start position 'S' not found")
+	// If no player was found
+	if playerPosition == (domain.Position{}) {
+		return domain.Position{}, fmt.Errorf("player start position 'S' not found")
+	}
+	// Success, exactly one player position was found
+	return playerPosition, nil
+
 }
 
-func parseGrid(rows []string) ([][]response.TileType, error) {
+func parseGrid(rows []string) ([][]domain.TileType, error) {
 
-	var grid [][]response.TileType
+	var grid [][]domain.TileType
 
 	for _, row := range rows {
-		var gridRow []response.TileType
+		var gridRow []domain.TileType
 
 		for _, char := range row {
 			tile, err := parseTile(char)
 
 			if err != nil {
-				return [][]response.TileType{}, err
+				return [][]domain.TileType{}, err
 			}
 			gridRow = append(gridRow, tile)
 		}
@@ -127,19 +121,19 @@ func parseGrid(rows []string) ([][]response.TileType, error) {
 	return grid, nil
 }
 
-var tileMappings = map[rune]response.TileType{
-	'#': response.TileWall,
-	'.': response.TileFloor,
-	'Z': response.TileGoal,
-	'S': response.TileFloor, // start position is represented as floor on the static grid
-	'M': response.TileFloor, // monster spawn points become floor on the static grid
+var tileMappings = map[rune]domain.TileType{
+	'#': domain.TileWall,
+	'.': domain.TileFloor,
+	'Z': domain.TileGoal,
+	'S': domain.TileFloor, // start position is represented as floor on the static grid
+	'M': domain.TileFloor, // monster spawn points become floor on the static grid
 }
 
-func parseTile(char rune) (response.TileType, error) {
+func parseTile(char rune) (domain.TileType, error) {
 	if tile, ok := tileMappings[char]; ok {
 		return tile, nil
 	}
-	return response.TileUnknown, fmt.Errorf("invalid tile character: %c", char)
+	return domain.TileUnknown, fmt.Errorf("invalid tile character: %c", char)
 }
 
 func getAmountRowsAndCols(rows []string) (int, int, error) {
@@ -174,35 +168,4 @@ func ensureRowsSameLength(rows []string) error {
 		}
 	}
 	return nil
-}
-
-func sanitizeRows(rows []string) []string {
-	cleaned := make([]string, 0, len(rows))
-	for _, row := range rows {
-		s := sanitizeRow(row)
-		if s == "" {
-			continue
-		}
-		cleaned = append(cleaned, s)
-	}
-
-	return cleaned
-}
-
-func sanitizeRow(row string) string {
-	var cleaned strings.Builder
-	cleaned.Grow(len(row))
-	for _, r := range row {
-		switch {
-		case unicode.In(r, unicode.Cf):
-			continue
-		case r == '\r' || r == '\t':
-			continue
-		default:
-			if _, ok := tileMappings[r]; ok {
-				cleaned.WriteRune(r)
-			}
-		}
-	}
-	return cleaned.String()
 }

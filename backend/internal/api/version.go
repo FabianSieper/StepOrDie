@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/FabianSieper/NotionQuest/internal/config"
+	"github.com/FabianSieper/StepOrDie/internal/config"
 )
 
 func ProjectVersionHandler(w http.ResponseWriter, r *http.Request) {
