@@ -1,7 +1,7 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { SmartButtonConfig } from '../../model/smart-button-config.model';
 import { NesButtonVariant } from '../../model/nes-button-variant.model';
+import { SmartButtonConfig } from '../../model/smart-button-config.model';
 import { SmartButtonState } from '../../model/smart-button-state.model';
 
 // Each state consists of a label and an icon
@@ -19,11 +19,12 @@ import { SmartButtonState } from '../../model/smart-button-state.model';
     >
       <div class="button-content">
         @if (currentButtonConfig().label) {
-        <div>
-          {{ currentButtonConfig().label }}
-        </div>
-        } @if (currentButtonConfig().icon) {
-        <mat-icon>{{ currentButtonConfig().icon }}</mat-icon>
+          <div>
+            {{ currentButtonConfig().label }}
+          </div>
+        }
+        @if (currentButtonConfig().icon) {
+          <mat-icon>{{ currentButtonConfig().icon }}</mat-icon>
         }
       </div>
     </button>
@@ -54,6 +55,7 @@ export class SmartButtonComponent {
     [SmartButtonState.OVERWRITE, [{ icon: 'save_as' }]],
     [SmartButtonState.LOAD, [{ icon: 'file_open' }]],
     [SmartButtonState.CANCEL, [{ icon: 'cancel' }]],
+    [SmartButtonState.FEEDBACK, [{ icon: 'bug_report' }]],
     [SmartButtonState.BACK, [{ icon: 'arrow_back' }, { label: 'Sure?' }, { label: 'Sure!' }]],
   ]);
 
@@ -61,7 +63,7 @@ export class SmartButtonComponent {
     () =>
       this.state() === SmartButtonState.SUCCESS ||
       this.state() === SmartButtonState.ERROR ||
-      this.state() === SmartButtonState.LOADING
+      this.state() === SmartButtonState.LOADING,
   );
 
   protected readonly currentButtonConfig = computed(() => {

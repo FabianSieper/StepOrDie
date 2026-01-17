@@ -3,8 +3,10 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { DialogType } from '../model/dialog-type.model';
+import { SmartButtonState } from '../model/smart-button-state.model';
 import { BackendService } from '../services/backend.service';
 import { MusicService } from '../services/music.service';
+import { setAndResetSignalWithDelay } from '../utils/set-and-reset-signal-with-delay';
 import { LandingPageComponent } from './landing-page.component';
 
 @Component({
@@ -15,6 +17,7 @@ import { LandingPageComponent } from './landing-page.component';
       [(gameId)]="gameId"
       [gameField]="gameField()"
       [displayDialogType]="displayDialogType()"
+      [playButtonState]="playButtonState()"
       [duplicateFound]="duplicateFound()"
       (changedGameField)="handleGameFieldChange($event)"
       (playClicked)="storeGameState()"
@@ -32,12 +35,13 @@ export class LandingPageContainer implements OnInit {
   protected musicService = inject(MusicService);
   protected backendService = inject(BackendService);
 
-  private readonly DISPLAY_SUCCESS_TIME = 1500;
+  private readonly USER_FEEDBACK_DISPLAY_TIME = 1500;
 
   protected readonly gameId = signal<string>('');
   protected readonly gameField = signal<string>('');
 
   protected readonly duplicateFound = signal(false);
+  protected readonly playButtonState = signal(SmartButtonState.PLAY);
 
   protected readonly displayDialogType = signal<DialogType | undefined>(undefined);
   protected readonly version = signal<string | undefined>(undefined);
@@ -49,22 +53,29 @@ export class LandingPageContainer implements OnInit {
   }
 
   protected async storeGameState(overwrite = false) {
-    this.displayDialogType.set(DialogType.LOADING);
+    this.playButtonState.set(SmartButtonState.LOADING);
 
+    // TODO: disble all input fields and other buttons
     try {
       await this.backendService.storeGameStateFromString(
         this.gameId(),
         this.gameField(),
-        overwrite
+        overwrite,
       );
-      this.displayDialogType.set(DialogType.SUCCESS);
+
+      this.playButtonState.set(SmartButtonState.SUCCESS);
 
       // Open game page after some time
       setTimeout(() => {
         this.loadExistingGame();
-      }, this.DISPLAY_SUCCESS_TIME);
+        this.playButtonState.set(SmartButtonState.PLAY);
+        // TODO: disble all input fields and other buttons
+      }, this.USER_FEEDBACK_DISPLAY_TIME);
     } catch (error) {
+      this.displayDialogType.set(undefined);
+
       this.handleRequestError(error);
+      // TODO: disble all input fields and other buttons
     }
   }
   protected async overwriteGameState() {
@@ -101,30 +112,45 @@ export class LandingPageContainer implements OnInit {
   private setRandomGameId() {
     this.gameId.set(
       Array.from({ length: 12 }, () =>
-        String.fromCharCode(97 + Math.floor(Math.random() * 26))
-      ).join('')
+        String.fromCharCode(97 + Math.floor(Math.random() * 26)),
+      ).join(''),
     );
   }
 
   private handleRequestError(error: unknown) {
     if (error instanceof HttpErrorResponse) {
       if (error.status === 400) {
+        setAndResetSignalWithDelay(
+          this.playButtonState,
+          SmartButtonState.ERROR,
+          SmartButtonState.PLAY,
+          this.USER_FEEDBACK_DISPLAY_TIME,
+        );
         this.logger.warn(
-          `Failed to parse playing board or request body. Received error: ${error.message}`
+          `Failed to parse playing board or request body. Received error: ${error.message}`,
         );
         // TODO: parsing seems to work even though there are invalid characters contained
-        this.displayDialogType.set(DialogType.USER_INPUT_ERROR);
       } else if (error.status === 409) {
         this.logger.warn(`Game state for game id already stored.`);
-        this.displayDialogType.set(undefined);
+        this.playButtonState.set(SmartButtonState.PLAY);
         this.duplicateFound.set(true);
       } else {
         this.logger.error(`Failed to store game state. Received error: ${error.message}`);
-        this.displayDialogType.set(DialogType.BACKEND_ERROR);
+        setAndResetSignalWithDelay(
+          this.playButtonState,
+          SmartButtonState.ERROR,
+          SmartButtonState.PLAY,
+          this.USER_FEEDBACK_DISPLAY_TIME,
+        );
       }
     } else {
+      setAndResetSignalWithDelay(
+        this.playButtonState,
+        SmartButtonState.ERROR,
+        SmartButtonState.PLAY,
+        this.USER_FEEDBACK_DISPLAY_TIME,
+      );
       this.logger.error(`Failed to store game state. Received generic error: ${error}`);
-      this.displayDialogType.set(DialogType.BACKEND_ERROR);
     }
   }
 

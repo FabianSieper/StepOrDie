@@ -9,4 +9,5 @@ export enum SmartButtonState {
   OVERWRITE = 'OVERWRITE',
   LOAD = 'LOAD',
   CANCEL = 'CANCEL',
+  FEEDBACK = 'FEEDBACK',
 }
