@@ -50,7 +50,6 @@ func (s *Server) StoreGameStateFromString(w http.ResponseWriter, r *http.Request
 }
 
 func (s *Server) StoreGameState(w http.ResponseWriter, r *http.Request) {
-
 	// TODO: request body does only require state and gameId, nothing else
 	var body request.StoreGameStateRequestBody
 	err := json.NewDecoder(r.Body).Decode(&body)

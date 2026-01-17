@@ -1,0 +1,24 @@
+.button-content {
+    display: flex;
+}
+
+.loading-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(180deg); }
+}
+
+button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+}
+
+.button-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

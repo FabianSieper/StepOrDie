@@ -1,10 +1,11 @@
 import { Component, input, output } from '@angular/core';
-import { MatIcon, MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { InfoDialogComponent } from '../components/info-dialog/info-dialog.component';
 import { MusicButtonContainer } from '../components/music-button/music-button.container';
+import { SmartButtonComponent } from '../components/smart-button/smart-button.component';
 import { VersionContainer } from '../components/version/version.container';
 import { DialogType } from '../model/dialog-type.model';
+import { SmartButtonFeedbackState } from '../model/nes-button-feedback-state.model';
+import { NesButtonVariant } from '../model/nes-button-variant.model';
 import { GameContainer } from './components/game/game.container';
 
 @Component({
@@ -15,9 +16,7 @@ import { GameContainer } from './components/game/game.container';
     InfoDialogComponent,
     MusicButtonContainer,
     VersionContainer,
-    MatIcon,
-    MatIconModule,
-    MatTooltipModule,
+    SmartButtonComponent,
   ],
   template: `
     <app-info-dialog-component
@@ -40,15 +39,18 @@ import { GameContainer } from './components/game/game.container';
         (gameWon)="gameWon.emit()"
       />
       <div class="button-row">
-        <!-- TODO: add tooltip for back -->
-        <!-- TODO: when clicked first time, change text so "sure?" and then proceed with the next click -->
-        <button (click)="backClicked.emit()" class="nes-btn">
-          <mat-icon matTooltip="hey">arrow_back</mat-icon>
-        </button>
-        <!-- TODO: add tooltip  -->
-        <button (click)="saveGameState.emit()" class="nes-btn is-primary">
-          <mat-icon>save</mat-icon>
-        </button>
+        <app-smart-button-component
+          [buttonStates]="[{ icon: 'arrow_back' }, { label: 'Sure?' }, { label: 'Sure!' }]"
+          (verifiedButtonClick)="backToMenu.emit()"
+        />
+        <!-- TODO: loading should just be displayed via the spinning icon -->
+        <!-- TODO: error should be displayed by an error on the icon for some seconds -->
+        <app-smart-button-component
+          [buttonStates]="[{ icon: 'save' }]"
+          [buttonVariant]="NesButtonVariant.PRIMARY"
+          [feedbackStateChange]="saveGameButtonFeedbackState()"
+          (verifiedButtonClick)="saveGameState.emit()"
+        />
       </div>
       <app-music-button-container />
       <app-version-container />
@@ -58,12 +60,14 @@ import { GameContainer } from './components/game/game.container';
 })
 export class GamePageComponent {
   readonly displayDialogType = input.required<DialogType | undefined>();
+  readonly saveGameButtonFeedbackState = input.required<SmartButtonFeedbackState>();
   readonly resetActiveDialogType = output();
-  readonly backClicked = output();
   readonly noClicked = output();
   readonly reloadGame = output();
   readonly backToMenu = output();
   readonly gameWon = output();
   readonly gameLost = output();
   readonly saveGameState = output();
+
+  readonly NesButtonVariant = NesButtonVariant;
 }

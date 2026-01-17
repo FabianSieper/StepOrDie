@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { map } from 'rxjs';
 import { DialogType } from '../model/dialog-type.model';
+import { SmartButtonFeedbackState } from '../model/nes-button-feedback-state.model';
 import { MusicService } from '../services/music.service';
 import { GamePageComponent } from './game-page.component';
 import { GameService } from './services/game.service';
@@ -15,8 +16,8 @@ import { GameService } from './services/game.service';
   template: `
     <app-game-page-component
       [displayDialogType]="displayDialogType()"
+      [saveGameButtonFeedbackState]="saveGameButtonFeedbackState()"
       (resetActiveDialogType)="this.displayDialogType.set(undefined)"
-      (backClicked)="displayDialogType.set(DialogType.ARE_YOU_SURE)"
       (noClicked)="displayDialogType.set(undefined)"
       (backToMenu)="router.navigate(['/'])"
       (reloadGame)="loadGame(gameId())"
@@ -33,9 +34,8 @@ export class GamePageContainer implements OnInit {
   private readonly gameService = inject(GameService);
   private readonly musicService = inject(MusicService);
 
-  private readonly DISPLAY_SUCCESS_TIME = 1500;
-
   protected readonly displayDialogType = signal<DialogType | undefined>(undefined);
+  protected readonly saveGameButtonFeedbackState = signal(SmartButtonFeedbackState.NONE);
 
   protected readonly gameId: Signal<string | undefined> = toSignal(
     this.route.paramMap.pipe(map((map) => map.get('gameId') ?? undefined))
@@ -53,21 +53,17 @@ export class GamePageContainer implements OnInit {
   protected async saveGameState() {
     const gameId = this.gameId();
     if (!gameId) {
+      this.saveGameButtonFeedbackState.set(SmartButtonFeedbackState.ERROR);
       throw Error('Game id is undefined. Failed to save game.');
     }
 
-    this.displayDialogType.set(DialogType.LOADING);
-
+    this.saveGameButtonFeedbackState.set(SmartButtonFeedbackState.LOADING);
     try {
       await this.gameService.saveGameState(gameId);
-      this.displayDialogType.set(DialogType.SUCCESS);
-
-      // Clear success message after some time
-      setTimeout(() => {
-        this.displayDialogType.set(undefined);
-      }, this.DISPLAY_SUCCESS_TIME);
+      this.saveGameButtonFeedbackState.set(SmartButtonFeedbackState.SUCCESS);
     } catch (error) {
-      this.handleSavingError(error, gameId);
+      this.logger.error('Failed to save game state');
+      this.saveGameButtonFeedbackState.set(SmartButtonFeedbackState.ERROR);
     }
   }
 
@@ -96,14 +92,6 @@ export class GamePageContainer implements OnInit {
     }
   }
 
-  private handleSavingError(error: unknown, gameId: string) {
-    if (error instanceof HttpErrorResponse) {
-      this.handleSavingHttpErrorResponse(error, gameId);
-    } else {
-      this.handleGenericError(error, gameId);
-    }
-  }
-
   private handleLoadingError(error: unknown, gameId: string) {
     if (error instanceof HttpErrorResponse) {
       this.handleLoadingHttpErrorResponse(error, gameId);
@@ -129,14 +117,6 @@ export class GamePageContainer implements OnInit {
       );
       this.displayDialogType.set(DialogType.BACKEND_ERROR);
     }
-  }
-
-  private handleSavingHttpErrorResponse(error: HttpErrorResponse, gameId: string) {
-    this.logger.error(
-      `Error saving game with gameId ${gameId}. Received error: ${JSON.stringify(error)}`
-    );
-    // TODO: use a dialog type for saving
-    this.displayDialogType.set(DialogType.BACKEND_ERROR);
   }
 
   protected DialogType = DialogType;
