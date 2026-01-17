@@ -1,4 +1,6 @@
 import { Component, input, output } from '@angular/core';
+import { MatIcon, MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { InfoDialogComponent } from '../components/info-dialog/info-dialog.component';
 import { MusicButtonContainer } from '../components/music-button/music-button.container';
 import { VersionContainer } from '../components/version/version.container';
@@ -8,7 +10,15 @@ import { GameContainer } from './components/game/game.container';
 @Component({
   selector: 'app-game-page-component',
   styleUrl: 'game-page.component.scss',
-  imports: [GameContainer, InfoDialogComponent, MusicButtonContainer, VersionContainer],
+  imports: [
+    GameContainer,
+    InfoDialogComponent,
+    MusicButtonContainer,
+    VersionContainer,
+    MatIcon,
+    MatIconModule,
+    MatTooltipModule,
+  ],
   template: `
     <app-info-dialog-component
       [displayDialogType]="displayDialogType()"
@@ -30,8 +40,15 @@ import { GameContainer } from './components/game/game.container';
         (gameWon)="gameWon.emit()"
       />
       <div class="button-row">
-        <button (click)="backClicked.emit()" class="nes-btn">Take me back</button>
-        <button (click)="saveGameState.emit()" class="nes-btn is-primary">Save</button>
+        <!-- TODO: add tooltip for back -->
+        <!-- TODO: when clicked first time, change text so "sure?" and then proceed with the next click -->
+        <button (click)="backClicked.emit()" class="nes-btn">
+          <mat-icon matTooltip="hey">arrow_back</mat-icon>
+        </button>
+        <!-- TODO: add tooltip  -->
+        <button (click)="saveGameState.emit()" class="nes-btn is-primary">
+          <mat-icon>save</mat-icon>
+        </button>
       </div>
       <app-music-button-container />
       <app-version-container />

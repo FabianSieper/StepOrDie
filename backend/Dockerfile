@@ -11,21 +11,23 @@ RUN go mod download
 # Copy the rest of the source code
 COPY . .
 
+# Install CA certificates in the builder so we can copy them into distroless.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 # Build the binary
 # CGO_ENABLED=0 creates a statically linked binary (required for 'scratch' or 'distroless')
 RUN CGO_ENABLED=0 GOOS=linux go build -o /main ./main.go
 
 # --- STAGE 2: Runtime ---
-  FROM gcr.io/distroless/static-debian12
+FROM gcr.io/distroless/static-debian12
 
-# Install CA certificates so outbound HTTPS (e.g. Notion API) works from the container.
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+# Copy CA certificates from the builder stage for HTTPS support.
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-# Run as a non-root user.
-RUN useradd -r -u 65532 -g nogroup appuser
-USER appuser
+# Run as a non-root user (distroless provides uid/gid, no useradd).
+USER 65532:65532
 
 # Copy the compiled binary from the builder stage
 COPY --from=builder /main /app/main
