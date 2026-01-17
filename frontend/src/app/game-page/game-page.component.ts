@@ -43,8 +43,11 @@ import { GameContainer } from './components/game/game.container';
           [buttonStates]="[{ icon: 'arrow_back' }, { label: 'Sure?' }, { label: 'Sure!' }]"
           (verifiedButtonClick)="backToMenu.emit()"
         />
-        <!-- TODO: loading should just be displayed via the spinning icon -->
-        <!-- TODO: error should be displayed by an error on the icon for some seconds -->
+        <app-smart-button-component
+          [buttonStates]="[{ icon: 'content_copy' }]"
+          [feedbackStateChange]="copyGameIdButtonFeedbackState()"
+          (verifiedButtonClick)="copyGameId.emit()"
+        />
         <app-smart-button-component
           [buttonStates]="[{ icon: 'save' }]"
           [buttonVariant]="NesButtonVariant.PRIMARY"
@@ -61,6 +64,7 @@ import { GameContainer } from './components/game/game.container';
 export class GamePageComponent {
   readonly displayDialogType = input.required<DialogType | undefined>();
   readonly saveGameButtonFeedbackState = input.required<SmartButtonFeedbackState>();
+  readonly copyGameIdButtonFeedbackState = input.required<SmartButtonFeedbackState>();
   readonly resetActiveDialogType = output();
   readonly noClicked = output();
   readonly reloadGame = output();
@@ -68,6 +72,7 @@ export class GamePageComponent {
   readonly gameWon = output();
   readonly gameLost = output();
   readonly saveGameState = output();
+  readonly copyGameId = output();
 
   readonly NesButtonVariant = NesButtonVariant;
 }

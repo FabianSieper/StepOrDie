@@ -1,3 +1,4 @@
+import { Clipboard, ClipboardModule } from '@angular/cdk/clipboard';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, effect, inject, OnInit, Signal, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -12,11 +13,13 @@ import { GameService } from './services/game.service';
 
 @Component({
   selector: 'app-game-page-container',
-  imports: [GamePageComponent],
+  standalone: true,
+  imports: [GamePageComponent, ClipboardModule],
   template: `
     <app-game-page-component
       [displayDialogType]="displayDialogType()"
       [saveGameButtonFeedbackState]="saveGameButtonFeedbackState()"
+      [copyGameIdButtonFeedbackState]="copyGameIdButtonFeedbackState()"
       (resetActiveDialogType)="this.displayDialogType.set(undefined)"
       (noClicked)="displayDialogType.set(undefined)"
       (backToMenu)="router.navigate(['/'])"
@@ -24,6 +27,7 @@ import { GameService } from './services/game.service';
       (gameLost)="displayDialogType.set(DialogType.LOST)"
       (gameWon)="displayDialogType.set(DialogType.WON)"
       (saveGameState)="saveGameState()"
+      (copyGameId)="copyGameId()"
     />
   `,
 })
@@ -33,9 +37,11 @@ export class GamePageContainer implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly gameService = inject(GameService);
   private readonly musicService = inject(MusicService);
+  private readonly clipboard = inject(Clipboard);
 
   protected readonly displayDialogType = signal<DialogType | undefined>(undefined);
   protected readonly saveGameButtonFeedbackState = signal(SmartButtonFeedbackState.NONE);
+  protected readonly copyGameIdButtonFeedbackState = signal(SmartButtonFeedbackState.NONE);
 
   protected readonly gameId: Signal<string | undefined> = toSignal(
     this.route.paramMap.pipe(map((map) => map.get('gameId') ?? undefined))
@@ -48,6 +54,16 @@ export class GamePageContainer implements OnInit {
 
   ngOnInit(): void {
     this.initMusicService();
+  }
+
+  protected copyGameId() {
+    const gameId = this.gameId();
+
+    if (!gameId) {
+      throw Error('Could nto copy game id, as game id is undefined');
+    }
+    this.clipboard.copy(gameId);
+    this.copyGameIdButtonFeedbackState.set(SmartButtonFeedbackState.SUCCESS);
   }
 
   protected async saveGameState() {
