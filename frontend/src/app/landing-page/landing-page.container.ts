@@ -15,9 +15,11 @@ import { LandingPageComponent } from './landing-page.component';
       [(gameId)]="gameId"
       [gameField]="gameField()"
       [displayDialogType]="displayDialogType()"
+      [duplicateFound]="duplicateFound()"
       (changedGameField)="handleGameFieldChange($event)"
       (playClicked)="storeGameState()"
       (overwriteGame)="overwriteGameState()"
+      (resetPlayButtonState)="duplicateFound.set(false)"
       (loadGame)="loadExistingGame()"
       (resetActiveDialogType)="this.displayDialogType.set(undefined)"
       (openFeedbackPackge)="router.navigate(['/feedback'])"
@@ -34,6 +36,8 @@ export class LandingPageContainer implements OnInit {
 
   protected readonly gameId = signal<string>('');
   protected readonly gameField = signal<string>('');
+
+  protected readonly duplicateFound = signal(false);
 
   protected readonly displayDialogType = signal<DialogType | undefined>(undefined);
   protected readonly version = signal<string | undefined>(undefined);
@@ -112,7 +116,8 @@ export class LandingPageContainer implements OnInit {
         this.displayDialogType.set(DialogType.USER_INPUT_ERROR);
       } else if (error.status === 409) {
         this.logger.warn(`Game state for game id already stored.`);
-        this.displayDialogType.set(DialogType.DUPLICATE_FOUND);
+        this.displayDialogType.set(undefined);
+        this.duplicateFound.set(true);
       } else {
         this.logger.error(`Failed to store game state. Received error: ${error.message}`);
         this.displayDialogType.set(DialogType.BACKEND_ERROR);

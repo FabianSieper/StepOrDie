@@ -50,6 +50,10 @@ export class SmartButtonComponent {
     [SmartButtonState.SAVE, [{ icon: 'save' }]],
     [SmartButtonState.ERROR, [{ icon: 'dangerous' }]],
     [SmartButtonState.LOADING, [{ icon: 'autorenew' }]],
+    [SmartButtonState.PLAY, [{ icon: 'play_arrow' }]],
+    [SmartButtonState.OVERWRITE, [{ icon: 'save_as' }]],
+    [SmartButtonState.LOAD, [{ icon: 'file_open' }]],
+    [SmartButtonState.CANCEL, [{ icon: 'cancel' }]],
     [SmartButtonState.BACK, [{ icon: 'arrow_back' }, { label: 'Sure?' }, { label: 'Sure!' }]],
   ]);
 
