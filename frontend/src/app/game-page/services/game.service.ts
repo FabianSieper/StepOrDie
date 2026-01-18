@@ -134,7 +134,6 @@ export class GameService {
 
   private async drawGame(ctx: CanvasRenderingContext2D) {
     try {
-      // TODO: drawing should be in responsibilty of entity class
       this.drawer.drawGame(ctx, this._game());
     } catch (error) {
       this.logger.error('Error while drawing game:', error);

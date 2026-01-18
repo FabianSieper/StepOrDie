@@ -28,7 +28,6 @@ import { SmartButtonState } from '../../model/smart-button-state.model';
   styleUrl: './smart-split-button.component.scss',
 })
 export class SmartSplitButtonComponent {
-  // TODO: add variant settings possibility
   readonly defaultButton = input.required<SmartSplitButtonConfig>();
   readonly splitButtons = input.required<SmartSplitButtonConfig[]>();
   readonly displaySplitButtons = input(false);

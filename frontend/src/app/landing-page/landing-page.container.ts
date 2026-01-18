@@ -1,3 +1,4 @@
+import { Clipboard } from '@angular/cdk/clipboard';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
@@ -8,7 +9,6 @@ import { BackendService } from '../services/backend.service';
 import { MusicService } from '../services/music.service';
 import { setAndResetSignalWithDelay } from '../utils/set-and-reset-signal-with-delay';
 import { LandingPageComponent } from './landing-page.component';
-import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
   selector: 'app-landing-page-container',
@@ -71,7 +71,6 @@ export class LandingPageContainer implements OnInit {
   protected async storeGameState(overwrite = false) {
     this.playButtonState.set(SmartButtonState.LOADING);
 
-    // TODO: disble all input fields and other buttons
     try {
       await this.backendService.storeGameStateFromString(
         this.gameId(),
@@ -85,13 +84,11 @@ export class LandingPageContainer implements OnInit {
       setTimeout(() => {
         this.loadExistingGame();
         this.playButtonState.set(SmartButtonState.PLAY);
-        // TODO: disble all input fields and other buttons
       }, this.USER_FEEDBACK_DISPLAY_TIME);
     } catch (error) {
       this.displayDialogType.set(undefined);
 
-      this.c(error);
-      // TODO: disble all input fields and other buttons
+      this.handleRequestError(error);
     }
   }
   protected async overwriteGameState() {
@@ -133,7 +130,7 @@ export class LandingPageContainer implements OnInit {
     );
   }
 
-  private c(error: unknown) {
+  private handleRequestError(error: unknown) {
     if (error instanceof HttpErrorResponse) {
       if (error.status === 400) {
         setAndResetSignalWithDelay(
@@ -145,7 +142,6 @@ export class LandingPageContainer implements OnInit {
         this.logger.warn(
           `Failed to parse playing board or request body. Received error: ${error.message}`,
         );
-        // TODO: parsing seems to work even though there are invalid characters contained
       } else if (error.status === 409) {
         this.logger.warn(`Game state for game id already stored.`);
         this.playButtonState.set(SmartButtonState.PLAY);

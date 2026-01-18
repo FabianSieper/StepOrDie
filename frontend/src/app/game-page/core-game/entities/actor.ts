@@ -13,7 +13,6 @@ export abstract class Actor extends Entity {
     super(gameElement);
   }
 
-  // TODO: convert all to booleans whicih return true if move was possible
   moveUp(game: Game): boolean {
     // Should always still at least look at into the direction
     this.lookUp();
@@ -78,10 +77,6 @@ export abstract class Actor extends Entity {
     this.died = true;
     this.gameElement.visuals.animationDetails.nextCol = 0; // Dying should always start from col 0
     this.gameElement.visuals.animationDetails.nextRow = 4;
-  }
-
-  cheer() {
-    // TODO: set corresponding sprite row + animate only once
   }
 
   override animate() {
