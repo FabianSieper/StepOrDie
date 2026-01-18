@@ -50,7 +50,6 @@ func (s *Server) StoreGameStateFromString(w http.ResponseWriter, r *http.Request
 }
 
 func (s *Server) StoreGameState(w http.ResponseWriter, r *http.Request) {
-	// TODO: request body does only require state and gameId, nothing else
 	var body request.StoreGameStateRequestBody
 	err := json.NewDecoder(r.Body).Decode(&body)
 
@@ -62,15 +61,13 @@ func (s *Server) StoreGameState(w http.ResponseWriter, r *http.Request) {
 	loadedGame, ok := s.Cache.Get(body.GameId)
 
 	if ok {
-		toBeSavedGameState := mapper.MapResponseGameState(body.Game.State)
+		toBeSavedGameState := mapper.StateToDomain(body.State)
 		loadedGame.SavedState = toBeSavedGameState
 		s.Cache.Set(body.GameId, &loadedGame)
 	} else {
-		game := mapper.GameToDomain(body.Game)
-		s.Cache.Set(body.GameId, &game)
-
+		http.Error(w, fmt.Sprintf("Failed to load game state as game itself was not found in game cache for id %s", body.GameId), http.StatusBadRequest)
+		return
 	}
-
 }
 
 func (s *Server) LoadGameState(w http.ResponseWriter, r *http.Request) {

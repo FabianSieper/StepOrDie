@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { Game } from '../model/game.model';
+import { Game, GameState } from '../model/game.model';
 
 @Injectable({ providedIn: 'root' })
 export class BackendService {
@@ -13,16 +13,16 @@ export class BackendService {
         gameId,
         playingBoard,
         overwrite,
-      })
+      }),
     );
   }
 
-  storeGameState(gameId: string, game: Game) {
+  storeGameState(gameId: string, state: GameState) {
     return firstValueFrom(
       this.httpClient.post<void>(this.getstoreGameStateUrl(), {
         gameId,
-        game,
-      })
+        state,
+      }),
     );
   }
 
@@ -32,7 +32,7 @@ export class BackendService {
 
   sendFeedback(name: string, feedback: string): Promise<void> {
     return firstValueFrom(
-      this.httpClient.post<void>(this.getSendFeedbackUrl(), { name, feedback })
+      this.httpClient.post<void>(this.getSendFeedbackUrl(), { name, feedback }),
     );
   }
 

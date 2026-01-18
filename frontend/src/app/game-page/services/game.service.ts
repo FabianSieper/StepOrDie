@@ -3,7 +3,7 @@ import { NGXLogger } from 'ngx-logger';
 import { BackendService } from '../../services/backend.service';
 import { Animator } from '../core-game/animator';
 import { Drawer } from '../core-game/drawer';
-import { mapToDomainGame, mapToDtoGame } from '../mapper/game.mapper';
+import { mapDomainState, mapToDomainGame } from '../mapper/game.mapper';
 import { Game, GameStatus } from '../model/game.model';
 import { KeyInputService } from './key-input.service';
 
@@ -53,10 +53,10 @@ export class GameService {
       return;
     }
 
-    this.logger.info(`Mapping domain game object to dto game object`);
-    const dtoGame = mapToDtoGame(game);
+    this.logger.info(`Mapping domain game object to dto state object`);
+    const dtoState = mapDomainState(game);
     this.logger.info(`Sending game state to backend`);
-    await this.backendService.storeGameState(gameId, dtoGame);
+    await this.backendService.storeGameState(gameId, dtoState);
     this.logger.info(`Successfully saved game state`);
   }
 

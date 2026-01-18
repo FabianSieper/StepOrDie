@@ -1,4 +1,4 @@
-import { EnemyDto, EnemyType, GameState, Game as DtoGame, TileType } from '../../model/game.model';
+import { Game as DtoGame, EnemyDto, EnemyType, GameState, TileType } from '../../model/game.model';
 import { Enemy } from '../core-game/entities/enemy';
 import { Player } from '../core-game/entities/player';
 import { Tile } from '../core-game/entities/tile';
@@ -13,12 +13,12 @@ export async function mapToDomainGame(Game: DtoGame): Promise<DomainGame> {
   };
 }
 
-export function mapToDtoGame(game: DomainGame): DtoGame {
+export function mapDomainState(game: DomainGame): GameState {
   return {
-    width: game.playingBoard.amountFieldsX,
-    height: game.playingBoard.amountFieldsY,
-    grid: mapTilesToGrid(game.tiles),
-    state: mapDomainState(game),
+    player: {
+      position: { ...game.player.getPosition() },
+    },
+    enemies: mapDomainEnemies(game.enemies),
   };
 }
 
@@ -32,7 +32,7 @@ async function mapToTiles(Game: DtoGame): Promise<Tile[][]> {
   const castleVisuals = await mapCastleVisuals();
 
   const tiles = Array.from({ length: Game.grid.length }, () =>
-    Array(Game.grid[0].length).fill(undefined)
+    Array(Game.grid[0].length).fill(undefined),
   );
 
   // For each tile, compute the corresponding Game Elements based on the tile type
@@ -79,7 +79,7 @@ async function mapCastleVisuals(): Promise<Visuals> {
     1, // rows
     // Start at animation frame col 0 and row 4
     0,
-    0
+    0,
   );
 }
 
@@ -91,7 +91,7 @@ async function mapFloorVisuals(): Promise<Visuals> {
     1, // rows
     // Start at animation frame col 0 and row 4
     0,
-    0
+    0,
   );
 }
 
@@ -103,7 +103,7 @@ async function mapMountainsVisuals(): Promise<Visuals> {
     1, // rows
     // Start at animation frame col 0 and row 4
     0,
-    0
+    0,
   );
 }
 
@@ -126,7 +126,7 @@ function mapEnemy(enemy: EnemyDto, enemyImage: HTMLImageElement): Enemy {
     6, // rows
     // Start at animation frame col 0 and row 1
     0,
-    1
+    1,
   );
   return new Enemy({
     visuals: spriteDetails,
@@ -142,7 +142,7 @@ async function extractPlayer(gameState: GameState): Promise<Player> {
     6, // rows
     // Start at animation frame col 0 and row 1
     0,
-    1
+    1,
   );
   return new Player({
     visuals: spriteDetails,
@@ -155,15 +155,6 @@ async function loadAssetAsImage(path: string) {
   image.src = path;
   await image.decode();
   return image;
-}
-
-function mapDomainState(game: DomainGame): GameState {
-  return {
-    player: {
-      position: { ...game.player.getPosition() },
-    },
-    enemies: mapDomainEnemies(game.enemies),
-  };
 }
 
 function mapDomainEnemies(enemies: Enemy[]): EnemyDto[] {
@@ -187,7 +178,7 @@ function mapTilesToGrid(tiles: Tile[][]): TileType[][] {
         return TileType.FLOOR;
       }
       return TileType.WALL;
-    })
+    }),
   );
 }
 
@@ -196,7 +187,7 @@ function createSpriteDetails(
   spriteCols: number,
   spriteRows: number,
   nextAnimationCol: number,
-  nextAnimationRow: number
+  nextAnimationRow: number,
 ): Visuals {
   return {
     spriteDetails: {
