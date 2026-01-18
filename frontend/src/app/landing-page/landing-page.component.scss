@@ -50,8 +50,16 @@ h1 {
 .button-row {
     display: flex;
     flex-direction: row;
+    gap: 5px;
+}
+
+.copy-button {
+    transform: scale(0.85);
+    margin-bottom: 5px;
 }
 
 .label-input-row {
     margin-top: 0px;
+    display: flex;
+    align-items: center;
 }

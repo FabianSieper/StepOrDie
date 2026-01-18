@@ -32,6 +32,7 @@ import { SmartButtonState } from '../model/smart-button-state.model';
             [disabled]="shallUserInteractionsBeDisabled()"
           />
           <app-smart-button-component
+          class="copy-button"
             [state]="copyButtonState()"
             [buttonVariant]="getNormalButtonVariant()"
             (verifiedButtonClick)="copyGameIdClicked.emit()"
