@@ -2,6 +2,7 @@ export enum SmartButtonState {
   SUCCESS = 'SUCCESS',
   COPY = 'COPY',
   ERROR = 'ERROR',
+  BACK_WITH_VERIFY = 'BACK_WITH_VERIFY',
   BACK = 'BACK',
   SAVE = 'SAVE',
   LOADING = 'LOADING',
@@ -10,4 +11,5 @@ export enum SmartButtonState {
   LOAD = 'LOAD',
   CANCEL = 'CANCEL',
   FEEDBACK = 'FEEDBACK',
+  SEND = 'SEND',
 }

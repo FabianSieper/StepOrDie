@@ -44,10 +44,10 @@ export class GamePageContainer implements OnInit {
   protected readonly displayDialogType = signal<DialogType | undefined>(undefined);
   protected readonly saveGameButtonState = signal(SmartButtonState.SAVE);
   protected readonly copyGameIdButtonState = signal(SmartButtonState.COPY);
-  protected readonly backButtonState = signal(SmartButtonState.BACK);
+  protected readonly backButtonState = signal(SmartButtonState.BACK_WITH_VERIFY);
 
   protected readonly gameId: Signal<string | undefined> = toSignal(
-    this.route.paramMap.pipe(map((map) => map.get('gameId') ?? undefined))
+    this.route.paramMap.pipe(map((map) => map.get('gameId') ?? undefined)),
   );
 
   private readonly RESET_SMART_BUTTON_STATE_DELAY = 2500;
@@ -71,7 +71,7 @@ export class GamePageContainer implements OnInit {
     this.copyGameIdButtonState.set(SmartButtonState.SUCCESS);
     setTimeout(
       () => this.copyGameIdButtonState.set(SmartButtonState.COPY),
-      this.RESET_SMART_BUTTON_STATE_DELAY
+      this.RESET_SMART_BUTTON_STATE_DELAY,
     );
   }
 
@@ -82,7 +82,7 @@ export class GamePageContainer implements OnInit {
         this.saveGameButtonState,
         SmartButtonState.ERROR,
         SmartButtonState.SAVE,
-        this.RESET_SMART_BUTTON_STATE_DELAY
+        this.RESET_SMART_BUTTON_STATE_DELAY,
       );
       throw Error('Game id is undefined. Failed to save game.');
     }
@@ -95,7 +95,7 @@ export class GamePageContainer implements OnInit {
         this.saveGameButtonState,
         SmartButtonState.SUCCESS,
         SmartButtonState.SAVE,
-        this.RESET_SMART_BUTTON_STATE_DELAY
+        this.RESET_SMART_BUTTON_STATE_DELAY,
       );
     } catch (error) {
       this.logger.error('Failed to save game state');
@@ -103,7 +103,7 @@ export class GamePageContainer implements OnInit {
         this.saveGameButtonState,
         SmartButtonState.ERROR,
         SmartButtonState.SAVE,
-        this.RESET_SMART_BUTTON_STATE_DELAY
+        this.RESET_SMART_BUTTON_STATE_DELAY,
       );
     }
   }
@@ -143,7 +143,7 @@ export class GamePageContainer implements OnInit {
 
   private handleGenericError(error: unknown, gameId: string) {
     this.logger.error(
-      `Failed to complete task for game id ${gameId}. Received error: ${JSON.stringify(error)}`
+      `Failed to complete task for game id ${gameId}. Received error: ${JSON.stringify(error)}`,
     );
     this.displayDialogType.set(DialogType.BACKEND_ERROR);
   }
@@ -154,7 +154,7 @@ export class GamePageContainer implements OnInit {
       this.displayDialogType.set(DialogType.NOT_FOUND);
     } else {
       this.logger.error(
-        `Error loading game with gameId ${gameId}. Received error: ${JSON.stringify(error)}`
+        `Error loading game with gameId ${gameId}. Received error: ${JSON.stringify(error)}`,
       );
       this.displayDialogType.set(DialogType.BACKEND_ERROR);
     }

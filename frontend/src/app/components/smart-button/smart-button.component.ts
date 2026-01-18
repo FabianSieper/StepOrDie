@@ -56,7 +56,12 @@ export class SmartButtonComponent {
     [SmartButtonState.LOAD, [{ icon: 'file_open' }]],
     [SmartButtonState.CANCEL, [{ icon: 'cancel' }]],
     [SmartButtonState.FEEDBACK, [{ icon: 'bug_report' }]],
-    [SmartButtonState.BACK, [{ icon: 'arrow_back' }, { label: 'Sure?' }, { label: 'Sure!' }]],
+    [SmartButtonState.BACK, [{ icon: 'arrow_back' }]],
+    [SmartButtonState.SEND, [{ icon: 'send' }]],
+    [
+      SmartButtonState.BACK_WITH_VERIFY,
+      [{ icon: 'arrow_back' }, { label: 'Back?' }, { label: 'Back!' }],
+    ],
   ]);
 
   protected readonly setIconAnimation = computed(() =>

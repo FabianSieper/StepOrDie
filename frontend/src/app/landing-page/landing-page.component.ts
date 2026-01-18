@@ -32,14 +32,13 @@ import { SmartButtonState } from '../model/smart-button-state.model';
             [disabled]="shallUserInteractionsBeDisabled()"
           />
           <app-smart-button-component
-          class="copy-button"
+            class="copy-button"
             [state]="copyButtonState()"
             [buttonVariant]="getNormalButtonVariant()"
             (verifiedButtonClick)="copyGameIdClicked.emit()"
           />
         </div>
         <label for="playing-field" class="space-above">Playing Field</label>
-        <!-- TODO: i have to maek sure that the font is exactly so big that 15 chars are fitting in height and width -->
         <textarea
           [disabled]="shallUserInteractionsBeDisabled()"
           id="playing-field"
